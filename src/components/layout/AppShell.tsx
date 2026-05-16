@@ -1,108 +1,280 @@
+import { useState, useEffect } from 'react'
 import { Outlet, NavLink, useNavigate } from 'react-router-dom'
 import { logout, getUser } from '@/lib/auth'
 
 const NAV = [
-  { to: '/dashboard', label: '📊 Overview'      },
-  { to: '/customers', label: '👥 Customer 360°' },
-  { to: '/credit',    label: '📈 Credit & NPL'  },
-  { to: '/fraud',     label: '🛡 Fraud & AML'   },
-  { to: '/branches',  label: '🏦 Branch Ops'    },
+  { to: '/dashboard', label: '📊', full: 'Overview'      },
+  { to: '/customers', label: '👥', full: 'Customer 360°' },
+  { to: '/credit',    label: '📈', full: 'Credit & NPL'  },
+  { to: '/fraud',     label: '🛡', full: 'Fraud & AML'   },
+  { to: '/branches',  label: '🏦', full: 'Branch Ops'    },
 ]
 
+/* ── Live clock for header ───────────────────────────────── */
+function HeaderClock() {
+  const [dt, setDt] = useState('')
+  useEffect(() => {
+    const tick = () => {
+      const n = new Date()
+      const date = n.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
+      const time = n.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+      setDt(date + '  ·  ' + time)
+    }
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [])
+  return (
+    <span style={{
+      fontSize: 12, color: 'var(--muted)',
+      fontVariantNumeric: 'tabular-nums', letterSpacing: '0.02em',
+    }}>
+      {dt}
+    </span>
+  )
+}
+
 export default function AppShell() {
-  const navigate = useNavigate()
-  const user = getUser()
-  const initials = (user?.name || 'AM').split(' ').map((n: string) => n[0]).join('').slice(0,2).toUpperCase()
+  const navigate   = useNavigate()
+  const user       = getUser()
+  const [collapsed, setCollapsed] = useState(false)
+  const [lang,      setLang]      = useState<'EN'|'FR'>('EN')
+
+  const initials = (user?.name || 'AM').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
+  const firstName = (user?.name || 'User').split(' ')[0]
 
   function handleLogout() {
     logout()
     navigate('/login', { replace: true })
   }
 
+  const SIDEBAR_W  = collapsed ? 60 : 228
+  const TRANSITION = 'width 0.25s cubic-bezier(0.4,0,0.2,1)'
+
   return (
     <div style={{ display: 'flex', width: '100%', minHeight: '100vh' }}>
 
-      {/* Sidebar */}
+      {/* ── Sidebar ── */}
       <aside style={{
-        width: 'var(--sidebar)', background: 'var(--green-900)',
+        width: SIDEBAR_W, minWidth: SIDEBAR_W,
+        background: '#060F1A',
         display: 'flex', flexDirection: 'column',
         position: 'sticky', top: 0, height: '100vh', flexShrink: 0,
+        overflow: 'hidden',
+        transition: TRANSITION,
+        borderRight: '0.5px solid rgba(255,255,255,0.06)',
+        zIndex: 20,
       }}>
-        {/* Logo */}
-        <div style={{ padding: '20px 18px 16px', borderBottom: '0.5px solid rgba(255,255,255,0.1)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+
+        {/* Logo row + collapse toggle */}
+        <div style={{
+          padding: collapsed ? '18px 0' : '18px 16px',
+          borderBottom: '0.5px solid rgba(255,255,255,0.07)',
+          display: 'flex', alignItems: 'center',
+          justifyContent: collapsed ? 'center' : 'space-between',
+          transition: TRANSITION,
+        }}>
+          {!collapsed && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 9 }}>
+              <div style={{
+                width: 32, height: 32, borderRadius: 8,
+                background: 'linear-gradient(135deg,#1D9E75,#0F6E56)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                flexShrink: 0,
+              }}>
+                <span style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>B</span>
+              </div>
+              <div>
+                <div style={{ color: '#fff', fontSize: 12, fontWeight: 600, letterSpacing: '-0.01em' }}>BankPulse 360°</div>
+                <div style={{ color: 'rgba(255,255,255,0.35)', fontSize: 9, letterSpacing: '0.04em' }}>BANKING INTELLIGENCE</div>
+              </div>
+            </div>
+          )}
+          {collapsed && (
             <div style={{
-              width: 34, height: 34, borderRadius: 9,
-              background: 'var(--green-400)',
+              width: 32, height: 32, borderRadius: 8,
+              background: 'linear-gradient(135deg,#1D9E75,#0F6E56)',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
             }}>
-              <span style={{ color: '#fff', fontSize: 17, fontWeight: 600 }}>B</span>
+              <span style={{ color: '#fff', fontSize: 16, fontWeight: 700 }}>B</span>
             </div>
-            <div>
-              <div style={{ color: '#fff', fontSize: 13, fontWeight: 500 }}>BankPulse 360°</div>
-              <div style={{ color: 'var(--green-100)', fontSize: 10 }}>Banking Intelligence</div>
-            </div>
-          </div>
+          )}
+          {/* Toggle button */}
+          <button onClick={() => setCollapsed(c => !c)} style={{
+            background: 'rgba(255,255,255,0.06)',
+            border: '0.5px solid rgba(255,255,255,0.1)',
+            borderRadius: 6, width: 24, height: 24,
+            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            color: 'rgba(255,255,255,0.5)', fontSize: 11, flexShrink: 0,
+            marginLeft: collapsed ? 0 : 4,
+          }}>
+            {collapsed ? '›' : '‹'}
+          </button>
         </div>
 
-        {/* Nav */}
-        <nav style={{ flex: 1, padding: '14px 10px' }}>
-          {NAV.map(({ to, label }) => (
-            <NavLink key={to} to={to} style={({ isActive }) => ({
-              display: 'block', padding: '9px 12px', borderRadius: 7,
-              marginBottom: 3, fontSize: 13, color: isActive ? '#fff' : 'rgba(255,255,255,0.55)',
-              background: isActive ? 'rgba(255,255,255,0.12)' : 'transparent',
+        {/* Nav links */}
+        <nav style={{ flex: 1, padding: collapsed ? '12px 8px' : '12px 10px', transition: TRANSITION }}>
+          {NAV.map(({ to, label, full }) => (
+            <NavLink key={to} to={to} title={full} style={({ isActive }) => ({
+              display: 'flex', alignItems: 'center',
+              gap: collapsed ? 0 : 10,
+              justifyContent: collapsed ? 'center' : 'flex-start',
+              padding: collapsed ? '10px 0' : '9px 12px',
+              borderRadius: 8, marginBottom: 3,
+              fontSize: collapsed ? 18 : 13,
+              color: isActive ? '#fff' : 'rgba(255,255,255,0.5)',
+              background: isActive ? 'rgba(29,158,117,0.18)' : 'transparent',
+              borderLeft: isActive ? '2px solid #1D9E75' : '2px solid transparent',
               transition: 'all 0.15s',
+              textDecoration: 'none',
             })}>
-              {label}
+              <span style={{ flexShrink: 0 }}>{label}</span>
+              {!collapsed && <span style={{ fontSize: 13 }}>{full}</span>}
             </NavLink>
           ))}
         </nav>
 
-        {/* User footer */}
+        {/* ── User footer block ── */}
         <div style={{
-          padding: '12px 14px', borderTop: '0.5px solid rgba(255,255,255,0.1)',
-          display: 'flex', alignItems: 'center', gap: 9,
+          borderTop: '0.5px solid rgba(255,255,255,0.07)',
+          padding: collapsed ? '12px 8px' : '12px 14px',
+          display: 'flex', flexDirection: 'column', gap: 8,
         }}>
-          <div style={{
-            width: 30, height: 30, borderRadius: '50%',
-            background: 'var(--green-600)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            color: '#fff', fontSize: 11, fontWeight: 600, flexShrink: 0,
-          }}>
-            {initials}
-          </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ color: '#fff', fontSize: 12, fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {user?.name || 'Demo User'}
+
+          {/* Language toggle row */}
+          {!collapsed && (
+            <button onClick={() => setLang(l => l === 'EN' ? 'FR' : 'EN')} style={{
+              display: 'flex', alignItems: 'center', gap: 8,
+              background: 'rgba(255,255,255,0.05)',
+              border: '0.5px solid rgba(255,255,255,0.1)',
+              borderRadius: 8, padding: '7px 10px',
+              cursor: 'pointer', width: '100%',
+              transition: 'background 0.15s',
+            }}>
+              <span style={{ fontSize: 15 }}>🌐</span>
+              <span style={{ color: '#fff', fontSize: 12, fontWeight: 600, letterSpacing: '0.04em' }}>{lang}</span>
+              <span style={{ color: 'rgba(255,255,255,0.3)', fontSize: 10, marginLeft: 'auto' }}>
+                {lang === 'EN' ? 'Switch to FR' : 'Passer en EN'}
+              </span>
+            </button>
+          )}
+
+          {/* User info block */}
+          {!collapsed ? (
+            <div style={{
+              background: 'rgba(255,255,255,0.05)',
+              border: '0.5px solid rgba(255,255,255,0.08)',
+              borderRadius: 10, padding: '10px 12px',
+            }}>
+              <div style={{ color: '#fff', fontSize: 13, fontWeight: 600, marginBottom: 2 }}>
+                {user?.name || 'Demo User'}
+              </div>
+              <div style={{
+                color: 'rgba(255,255,255,0.35)', fontSize: 10,
+                textTransform: 'uppercase', letterSpacing: '0.08em',
+              }}>
+                {user?.role || 'EXECUTIVE'}
+              </div>
             </div>
-            <div style={{ color: 'rgba(255,255,255,0.4)', fontSize: 10, textTransform: 'capitalize' }}>
-              {user?.role || 'executive'}
+          ) : (
+            <div style={{
+              width: 36, height: 36, borderRadius: '50%',
+              background: 'var(--green-600)', margin: '0 auto',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              color: '#fff', fontSize: 12, fontWeight: 700,
+            }}>
+              {initials}
             </div>
-          </div>
+          )}
+
+          {/* Logout */}
           <button onClick={handleLogout} style={{
+            display: 'flex', alignItems: 'center',
+            gap: collapsed ? 0 : 10,
+            justifyContent: collapsed ? 'center' : 'flex-start',
             background: 'none', border: 'none', cursor: 'pointer',
-            color: 'rgba(255,255,255,0.4)', fontSize: 11, padding: 4,
+            color: '#E05A5A', fontSize: 13, fontWeight: 500,
+            padding: collapsed ? '8px 0' : '6px 4px',
+            borderRadius: 6, width: '100%',
+            transition: 'opacity 0.15s',
           }}>
-            Sign out
+            {/* Logout arrow icon */}
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M6 14H3a1 1 0 01-1-1V3a1 1 0 011-1h3" stroke="#E05A5A" strokeWidth="1.4" strokeLinecap="round"/>
+              <path d="M10 11l3-3-3-3M13 8H6" stroke="#E05A5A" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            {!collapsed && <span>Logout</span>}
           </button>
+
         </div>
       </aside>
 
-      {/* Main */}
+      {/* ── Main ── */}
       <main style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+
+        {/* Header */}
         <header style={{
-          height: 'var(--topbar)', background: 'var(--surface)',
+          height: 56, background: 'var(--surface)',
           borderBottom: '0.5px solid var(--border)',
           display: 'flex', alignItems: 'center',
-          justifyContent: 'flex-end', padding: '0 24px',
+          padding: '0 24px', gap: 12,
+          position: 'sticky', top: 0, zIndex: 10,
         }}>
-          <span style={{ fontSize: 11, color: 'var(--green-600)' }}>● Live · BigQuery</span>
+
+          {/* Left — greeting */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+            <span style={{ fontSize: 18 }}>👋</span>
+            <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--green-600)', whiteSpace: 'nowrap' }}>
+              Hello, {firstName}!
+            </span>
+          </div>
+
+          {/* Center — date & time */}
+          <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+            <HeaderClock />
+          </div>
+
+          {/* Right — live indicator + language */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            background: 'var(--surface-2)',
+            border: '0.5px solid var(--border)',
+            borderRadius: 20, padding: '5px 12px',
+            flexShrink: 0,
+          }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--green-600)', fontWeight: 500 }}>
+              <span style={{
+                width: 6, height: 6, borderRadius: '50%',
+                background: 'var(--green-400)', display: 'inline-block',
+                animation: 'livepulse 1.8s ease-in-out infinite',
+              }} />
+              Live Data
+            </span>
+            <span style={{ color: 'var(--border-md)', fontSize: 11 }}>|</span>
+            <button onClick={() => setLang(l => l === 'EN' ? 'FR' : 'EN')} style={{
+              display: 'flex', alignItems: 'center', gap: 4,
+              background: 'none', border: 'none', cursor: 'pointer',
+              fontSize: 11, fontWeight: 600, color: 'var(--muted)',
+              padding: 0,
+            }}>
+              <span style={{ fontSize: 13 }}>🌐</span>
+              {lang}
+            </button>
+          </div>
+
         </header>
+
         <div style={{ flex: 1, padding: 24, overflowY: 'auto' }}>
           <Outlet />
         </div>
       </main>
+
+      <style>{`
+        @keyframes livepulse {
+          0%,100% { opacity:1; transform:scale(1) }
+          50%      { opacity:0.4; transform:scale(0.7) }
+        }
+      `}</style>
     </div>
   )
 }
