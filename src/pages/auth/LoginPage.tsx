@@ -23,14 +23,14 @@ function AnimatedBackground() {
     window.addEventListener('resize', onResize)
 
     /* Floating orbs */
-    const orbs = Array.from({ length: 6 }, (_, i) => ({
+    const orbs = Array.from({ length: 9 }, (_, i) => ({
       x:  Math.random() * W,
       y:  Math.random() * H,
-      r:  120 + Math.random() * 180,
-      vx: (Math.random() - 0.5) * 0.18,
-      vy: (Math.random() - 0.5) * 0.18,
-      hue: i % 2 === 0 ? 160 : 175,
-      alpha: 0.045 + Math.random() * 0.04,
+      r:  160 + Math.random() * 220,
+      vx: (Math.random() - 0.5) * 0.22,
+      vy: (Math.random() - 0.5) * 0.22,
+      hue: i % 3 === 0 ? 155 : i % 3 === 1 ? 168 : 145,
+      alpha: 0.13 + Math.random() * 0.10,
     }))
 
     /* Moving grid lines */
@@ -48,9 +48,9 @@ function AnimatedBackground() {
       ctx.fillRect(0, 0, W, H)
 
       /* Subtle grid */
-      gridOffset = (gridOffset + 0.15) % 60
-      ctx.strokeStyle = 'rgba(29,158,117,0.04)'
-      ctx.lineWidth   = 0.5
+      gridOffset = (gridOffset + 0.2) % 60
+      ctx.strokeStyle = 'rgba(29,158,117,0.12)'
+      ctx.lineWidth = 0.8
       for (let x = -60 + gridOffset; x < W + 60; x += 60) {
         ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke()
       }
@@ -76,8 +76,8 @@ function AnimatedBackground() {
       })
 
       /* Subtle diagonal data lines */
-      ctx.strokeStyle = 'rgba(29,158,117,0.06)'
-      ctx.lineWidth   = 0.5
+      ctx.strokeStyle = 'rgba(29,158,117,0.18)'
+      ctx.lineWidth = 0.8
       for (let i = 0; i < 5; i++) {
         const t = (Date.now() / 8000 + i * 0.2) % 1
         const x = t * (W + 400) - 200
@@ -270,12 +270,10 @@ export default function LoginPage() {
           }}>
 
             <div style={{ marginBottom: 22, textAlign: 'center' }}>
-              <span style={{
-                fontSize: 11, color: 'rgba(255,255,255,0.35)',
-                letterSpacing: '0.1em', textTransform: 'uppercase',
-              }}>
-                Secure Sign In
-              </span>
+              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 2L4 7v9c0 7 5.4 13.5 12 15 6.6-1.5 12-8 12-15V7L16 2z" fill="rgba(29,158,117,0.18)" stroke="rgba(29,158,117,0.6)" strokeWidth="1.2" strokeLinejoin="round"/>
+                <path d="M11 16l3.5 3.5 6.5-7" stroke="#1D9E75" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
             </div>
 
             <form onSubmit={handleSubmit}>
