@@ -1,0 +1,57 @@
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 15px;
+  background: #F1EFE8;
+  color: #1A1916;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root { display: flex; min-height: 100vh; }
+
+:root {
+  --green-900: #04342C;
+  --green-600: #0F6E56;
+  --green-400: #1D9E75;
+  --green-100: #9FE1CB;
+  --green-50:  #E1F5EE;
+  --amber:     #EF9F27;
+  --red:       #E24B4A;
+  --surface:   #FFFFFF;
+  --surface-2: #F7F6F2;
+  --surface-3: #F1EFE8;
+  --border:    rgba(0,0,0,0.08);
+  --border-md: rgba(0,0,0,0.14);
+  --muted:     #6B6960;
+  --subtle:    #9E9C94;
+  --sidebar:   228px;
+  --topbar:    56px;
+}
+
+a { text-decoration: none; }
+
+.card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+}
+
+.kpi-card {
+  background: var(--surface);
+  border: 0.5px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+button { font-family: inherit; }
+
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-md); border-radius: 3px; }
+
+/* Login page dark inputs */
+input[data-login] {
+  color-scheme: dark;
+}
