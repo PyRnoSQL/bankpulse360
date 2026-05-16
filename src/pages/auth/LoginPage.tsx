@@ -152,6 +152,83 @@ function MetricTicker() {
 }
 
 /* ── Main login page ─────────────────────────────────────── */
+
+/* ── Weather + Clock widget ──────────────────────────────── */
+function WeatherClock() {
+  const [time, setTime]       = useState('')
+  const [date, setDate]       = useState('')
+  const [weather, setWeather] = useState<{ temp: string; desc: string; icon: string; city: string } | null>(null)
+
+  // Clock — updates every second
+  useEffect(() => {
+    function tick() {
+      const now = new Date()
+      setTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }))
+      setDate(now.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }))
+    }
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  // Weather — browser Geolocation → Open-Meteo (free, no key)
+  useEffect(() => {
+    if (!navigator.geolocation) {
+      setWeather({ temp: '--', desc: 'Unavailable', icon: '🌍', city: '' })
+      return
+    }
+    navigator.geolocation.getCurrentPosition(
+      async ({ coords }) => {
+        try {
+          const [weatherRes, geoRes] = await Promise.all([
+            fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.latitude}&longitude=${coords.longitude}&current=temperature_2m,weathercode&temperature_unit=celsius`),
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${coords.latitude}&lon=${coords.longitude}&format=json`)
+          ])
+          const weatherData = await weatherRes.json()
+          const geoData     = await geoRes.json()
+          const temp   = Math.round(weatherData.current.temperature_2m)
+          const code   = weatherData.current.weathercode
+          const { desc, icon } = weatherCode(code)
+          const city   = geoData.address?.city
+                      || geoData.address?.town
+                      || geoData.address?.village
+                      || geoData.address?.county
+                      || 'Unknown'
+          setWeather({ temp: temp + '°C', desc, icon, city })
+        } catch {
+          setWeather({ temp: '--', desc: 'Unavailable', icon: '🌡', city: '' })
+        }
+      },
+      () => setWeather({ temp: '--', desc: 'Location denied', icon: '📍', city: '' })
+    )
+  }, [])
+
+  return (
+    <div style={{ textAlign: 'right', lineHeight: 1.4 }}>
+      <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', fontVariantNumeric: 'tabular-nums', letterSpacing: '0.03em' }}>
+        {weather ? <span>{weather.icon} {weather.temp}{weather.city ? ' · ' + weather.city : ''} · {weather.desc}</span> : <span>⏳ Locating…</span>}
+      </div>
+      <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.02em' }}>
+        {date} · {time}
+      </div>
+    </div>
+  )
+}
+
+function weatherCode(code: number): { desc: string; icon: string } {
+  if (code === 0)                    return { desc: 'Clear sky',        icon: '☀️' }
+  if (code <= 2)                     return { desc: 'Partly cloudy',    icon: '⛅' }
+  if (code === 3)                    return { desc: 'Overcast',         icon: '☁️' }
+  if (code <= 48)                    return { desc: 'Foggy',            icon: '🌫' }
+  if (code <= 57)                    return { desc: 'Drizzle',          icon: '🌦' }
+  if (code <= 67)                    return { desc: 'Rain',             icon: '🌧' }
+  if (code <= 77)                    return { desc: 'Snow',             icon: '❄️' }
+  if (code <= 82)                    return { desc: 'Rain showers',     icon: '🌦' }
+  if (code <= 86)                    return { desc: 'Snow showers',     icon: '🌨' }
+  if (code <= 99)                    return { desc: 'Thunderstorm',     icon: '⛈' }
+  return                                    { desc: 'Unknown',          icon: '🌡' }
+}
+
 export default function LoginPage() {
   const [userId,   setUserId]   = useState('')
   const [password, setPassword] = useState('')
@@ -221,12 +298,7 @@ export default function LoginPage() {
             </span>
           </div>
           <MetricTicker />
-          <div style={{
-            fontSize: 11, color: 'rgba(255,255,255,0.35)',
-            letterSpacing: '0.08em', textTransform: 'uppercase',
-          }}>
-            Cameroon · CEMAC Region
-          </div>
+          <WeatherClock />
         </div>
 
         {/* Main card */}
