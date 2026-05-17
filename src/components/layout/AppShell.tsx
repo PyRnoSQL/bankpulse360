@@ -254,26 +254,27 @@ export default function AppShell() {
 
           {/* Right — Live + lang pill */}
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            background: 'var(--surface-2)',
-            border: '0.5px solid var(--border)',
-            borderRadius: 20, padding: '4px 12px', flexShrink: 0,
+            display: 'flex', alignItems: 'center', gap: 10,
+            background: 'rgba(255,255,255,0.08)',
+            border: '1px solid rgba(255,255,255,0.18)',
+            borderRadius: 20, padding: '5px 14px', flexShrink: 0,
           }}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--green-600)', fontWeight: 500 }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 11, color: '#34D399', fontWeight: 600 }}>
               <span style={{
                 width: 6, height: 6, borderRadius: '50%',
-                background: 'var(--green-400)', display: 'inline-block',
+                background: '#34D399', display: 'inline-block',
                 animation: 'livepulse 1.8s ease-in-out infinite',
               }} />
               Live Data
             </span>
-            <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11 }}>|</span>
+            <span style={{ color: 'rgba(255,255,255,0.25)', fontSize: 12 }}>|</span>
             <button onClick={() => setLang(l => l === 'EN' ? 'FR' : 'EN')} style={{
-              display: 'flex', alignItems: 'center', gap: 4,
+              display: 'flex', alignItems: 'center', gap: 5,
               background: 'none', border: 'none', cursor: 'pointer',
-              fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.55)', padding: 0,
+              fontSize: 12, fontWeight: 700, color: '#FFFFFF', padding: 0,
+              letterSpacing: '0.04em',
             }}>
-              <span style={{ fontSize: 13 }}>🌐</span>
+              <span style={{ fontSize: 14 }}>🌐</span>
               {lang}
             </button>
           </div>
