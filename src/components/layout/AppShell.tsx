@@ -10,28 +10,33 @@ const NAV = [
   { to: '/branches',  label: '🏦', full: 'Branch Ops'    },
 ]
 
-/* ── Live clock for header ───────────────────────────────── */
-function HeaderClock() {
-  const [dt, setDt] = useState('')
+/* ── Date string (static per second) ────────────────────── */
+function useNow() {
+  const [now, setNow] = useState(new Date())
   useEffect(() => {
-    const tick = () => {
-      const n = new Date()
-      const date = n.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
-      const time = n.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-      setDt(date + '  ·  ' + time)
-    }
-    tick()
-    const id = setInterval(tick, 1000)
+    const id = setInterval(() => setNow(new Date()), 1000)
     return () => clearInterval(id)
   }, [])
+  return now
+}
+
+function LiveTime() {
+  const now  = useNow()
+  const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
   return (
     <span style={{
       fontSize: 12, color: 'var(--muted)',
       fontVariantNumeric: 'tabular-nums', letterSpacing: '0.02em',
+      fontWeight: 500,
     }}>
-      {dt}
+      {time}
     </span>
   )
+}
+
+function ShortDate() {
+  const now  = useNow()
+  return now.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })
 }
 
 export default function AppShell() {
@@ -211,36 +216,47 @@ export default function AppShell() {
 
       {/* ── Main ── */}
       <main style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
-
-        {/* Header */}
+        {/* ── Header: single row ─────────────────────────────── */}
         <header style={{
-          height: 56, background: 'var(--surface)',
+          background: 'var(--surface)',
           borderBottom: '0.5px solid var(--border)',
-          display: 'flex', alignItems: 'center',
-          padding: '0 24px', gap: 12,
           position: 'sticky', top: 0, zIndex: 10,
+          padding: '8px 24px',
+          display: 'flex', alignItems: 'center', gap: 12,
+          minHeight: 56,
         }}>
 
-          {/* Left — greeting */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
-            <span style={{ fontSize: 18 }}>👋</span>
-            <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--green-600)', whiteSpace: 'nowrap' }}>
-              Hello, {firstName}!
+          {/* Left — title + subtitle stacked */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
+            <span style={{
+              fontSize: 15, fontWeight: 600, color: 'var(--green-600)',
+              fontFamily: "'DM Serif Display', serif",
+              letterSpacing: '-0.01em', whiteSpace: 'nowrap',
+            }}>
+              Bank Health Overview
+            </span>
+            <span style={{ fontSize: 10, color: 'var(--subtle)', letterSpacing: '0.02em' }}>
+              All regions · Cameroon
             </span>
           </div>
 
-          {/* Center — date & time */}
+          {/* Center — platform tagline */}
           <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
-            <HeaderClock />
+            <span style={{
+              fontSize: 11, color: 'var(--subtle)',
+              letterSpacing: '0.07em', textTransform: 'uppercase',
+              fontWeight: 500, whiteSpace: 'nowrap',
+            }}>
+              Operational Intelligence Platform
+            </span>
           </div>
 
-          {/* Right — live indicator + language */}
+          {/* Right — Live + lang pill */}
           <div style={{
-            display: 'flex', alignItems: 'center', gap: 10,
+            display: 'flex', alignItems: 'center', gap: 8,
             background: 'var(--surface-2)',
             border: '0.5px solid var(--border)',
-            borderRadius: 20, padding: '5px 12px',
-            flexShrink: 0,
+            borderRadius: 20, padding: '4px 12px', flexShrink: 0,
           }}>
             <span style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, color: 'var(--green-600)', fontWeight: 500 }}>
               <span style={{
@@ -254,8 +270,7 @@ export default function AppShell() {
             <button onClick={() => setLang(l => l === 'EN' ? 'FR' : 'EN')} style={{
               display: 'flex', alignItems: 'center', gap: 4,
               background: 'none', border: 'none', cursor: 'pointer',
-              fontSize: 11, fontWeight: 600, color: 'var(--muted)',
-              padding: 0,
+              fontSize: 11, fontWeight: 600, color: 'var(--muted)', padding: 0,
             }}>
               <span style={{ fontSize: 13 }}>🌐</span>
               {lang}

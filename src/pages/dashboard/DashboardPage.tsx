@@ -102,6 +102,59 @@ function SectionHeader({ icon, label, color }: { icon: string; label: string; co
 }
 
 /* ── Main page ───────────────────────────────────────────── */
+/* ── Greeting + clock bar ───────────────────────────────── */
+function GreetingBar() {
+  const user = (() => {
+    try {
+      const t = localStorage.getItem('bp360_token')
+      if (!t) return null
+      return JSON.parse(atob(t.split('.')[1]))
+    } catch { return null }
+  })()
+  const firstName = (user?.name || 'User').split(' ')[0]
+
+  const [time, setTime] = useState('')
+  const [date, setDate] = useState('')
+  useEffect(() => {
+    const tick = () => {
+      const now = new Date()
+      setTime(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }))
+      setDate(now.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }))
+    }
+    tick()
+    const id = setInterval(tick, 1000)
+    return () => clearInterval(id)
+  }, [])
+
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      marginBottom: 24, paddingBottom: 16,
+      borderBottom: '0.5px solid rgba(255,255,255,0.07)',
+    }}>
+      {/* Left — greeting + date */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <span style={{ fontSize: 20 }}>👋</span>
+        <span style={{ fontSize: 15, fontWeight: 600, color: '#34D399', whiteSpace: 'nowrap' }}>
+          Hello, {firstName}!
+        </span>
+        <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 14 }}>—</span>
+        <span style={{ fontSize: 13, color: '#64748B', whiteSpace: 'nowrap' }}>
+          {date}
+        </span>
+      </div>
+      {/* Right — live clock */}
+      <span style={{
+        fontSize: 13, color: '#64748B',
+        fontVariantNumeric: 'tabular-nums',
+        letterSpacing: '0.04em', fontWeight: 500,
+      }}>
+        {time}
+      </span>
+    </div>
+  )
+}
+
 export default function DashboardPage() {
   const [data,    setData]    = useState<Summary | null>(null)
   const [loading, setLoading] = useState(true)
@@ -118,36 +171,13 @@ export default function DashboardPage() {
     <div style={{
       minHeight: '100%',
       background: 'linear-gradient(160deg, #060F1A 0%, #0A1628 40%, #06120E 100%)',
-      margin: -24, padding: 24,
+      margin: -24, padding: '20px 24px 24px',
     }}>
 
-      {/* ── Page header ── */}
-      <div style={{ marginBottom: 28 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
-          <div style={{
-            width: 4, height: 28, borderRadius: 2,
-            background: 'linear-gradient(180deg,#1D9E75,#0F6E56)',
-          }} />
-          <h1 style={{
-            fontFamily: "'DM Serif Display', serif",
-            fontSize: 26, fontWeight: 400, color: '#F1F5F9',
-            margin: 0, letterSpacing: '-0.01em',
-          }}>
-            Bank Health Overview
-          </h1>
-        </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginLeft: 14 }}>
-          <span style={{ fontSize: 12, color: '#475569' }}>All regions · Cameroon</span>
-          <span style={{
-            fontSize: 10, padding: '2px 8px', borderRadius: 10,
-            background: 'rgba(29,158,117,0.12)',
-            border: '0.5px solid rgba(29,158,117,0.3)',
-            color: '#34D399', fontWeight: 500, letterSpacing: '0.04em',
-          }}>
-            ● LIVE · BigQuery
-          </span>
-        </div>
-      </div>
+      {/* ── Greeting bar ── */}
+      <GreetingBar />
+
+
 
       {/* ── States ── */}
       {loading && (
