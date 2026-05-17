@@ -218,24 +218,25 @@ export default function AppShell() {
       <main style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
         {/* ── Header: single row ─────────────────────────────── */}
         <header style={{
-          background: 'var(--surface)',
-          borderBottom: '0.5px solid var(--border)',
+          background: 'linear-gradient(135deg, #0D1B2A 0%, #0A1F14 100%)',
+          borderBottom: '0.5px solid rgba(29,158,117,0.18)',
           position: 'sticky', top: 0, zIndex: 10,
           padding: '8px 24px',
           display: 'flex', alignItems: 'center', gap: 12,
           minHeight: 56,
+          boxShadow: '0 2px 16px rgba(0,0,0,0.4)',
         }}>
 
           {/* Left — title + subtitle stacked */}
           <div style={{ display: 'flex', flexDirection: 'column', gap: 1, minWidth: 0 }}>
             <span style={{
-              fontSize: 15, fontWeight: 600, color: 'var(--green-600)',
+              fontSize: 15, fontWeight: 600, color: '#34D399',
               fontFamily: "'DM Serif Display', serif",
               letterSpacing: '-0.01em', whiteSpace: 'nowrap',
             }}>
               Bank Health Overview
             </span>
-            <span style={{ fontSize: 10, color: 'var(--subtle)', letterSpacing: '0.02em' }}>
+            <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', letterSpacing: '0.02em' }}>
               All regions · Cameroon
             </span>
           </div>
@@ -243,7 +244,7 @@ export default function AppShell() {
           {/* Center — platform tagline */}
           <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
             <span style={{
-              fontSize: 11, color: 'var(--subtle)',
+              fontSize: 11, color: 'rgba(255,255,255,0.3)',
               letterSpacing: '0.07em', textTransform: 'uppercase',
               fontWeight: 500, whiteSpace: 'nowrap',
             }}>
@@ -266,11 +267,11 @@ export default function AppShell() {
               }} />
               Live Data
             </span>
-            <span style={{ color: 'var(--border-md)', fontSize: 11 }}>|</span>
+            <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 11 }}>|</span>
             <button onClick={() => setLang(l => l === 'EN' ? 'FR' : 'EN')} style={{
               display: 'flex', alignItems: 'center', gap: 4,
               background: 'none', border: 'none', cursor: 'pointer',
-              fontSize: 11, fontWeight: 600, color: 'var(--muted)', padding: 0,
+              fontSize: 11, fontWeight: 600, color: 'rgba(255,255,255,0.55)', padding: 0,
             }}>
               <span style={{ fontSize: 13 }}>🌐</span>
               {lang}
