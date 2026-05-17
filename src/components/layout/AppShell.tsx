@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react'
-import { Outlet, NavLink, useNavigate } from 'react-router-dom'
+import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { logout, getUser } from '@/lib/auth'
+
+
+const PAGE_META: Record<string, { title: string; subtitle: string }> = {
+  '/dashboard': { title: 'Bank Health Overview',       subtitle: 'All regions · Cameroon'                         },
+  '/customers': { title: 'Customer 360°',              subtitle: 'Segmentation · Churn · NBO · Omni-channel'      },
+  '/credit':    { title: 'Credit Risk & NPL',          subtitle: 'AI scoring · IFRS 9 · Portfolio · EWS'          },
+  '/fraud':     { title: 'Fraud & AML',                subtitle: 'Detection · Typology · SAR workflow · Sanctions' },
+  '/branches':  { title: 'Branch Operations',          subtitle: 'Lean Six Sigma · Process mining · SPC · DMAIC'  },
+}
 
 const NAV = [
   { to: '/dashboard', label: '📊', full: 'Overview'      },
@@ -41,7 +50,9 @@ function ShortDate() {
 
 export default function AppShell() {
   const navigate   = useNavigate()
+  const location   = useLocation()
   const user       = getUser()
+  const page = PAGE_META[location.pathname] || PAGE_META['/dashboard']
   const [collapsed, setCollapsed] = useState(false)
   const [lang,      setLang]      = useState<'EN'|'FR'>('EN')
 
@@ -234,10 +245,10 @@ export default function AppShell() {
               fontFamily: "'DM Serif Display', serif",
               letterSpacing: '-0.01em', whiteSpace: 'nowrap',
             }}>
-              Bank Health Overview
+              {page.title}
             </span>
             <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.38)', letterSpacing: '0.02em' }}>
-              All regions · Cameroon
+              {page.subtitle}
             </span>
           </div>
 
