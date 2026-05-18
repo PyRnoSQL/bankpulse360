@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import BranchGISMap from '@/components/maps/BranchGISMap'
 import { authHeader } from '@/lib/auth'
 
 function GreetingBar() {
@@ -42,63 +43,6 @@ function Section({ title, color, children }: { title: string; color: string; chi
   )
 }
 
-function CameroonMap({ branches }: { branches: any[] }) {
-  const W = 580
-  const H = 400
-  const LAT_MIN = 1.6, LAT_MAX = 13.1
-  const LON_MIN = 8.3, LON_MAX = 16.2
-  const PAD = 40
-  const toX = (lon: number) => PAD + ((lon - LON_MIN) / (LON_MAX - LON_MIN)) * (W - PAD * 2)
-  const toY = (lat: number) => PAD + ((LAT_MAX - lat) / (LAT_MAX - LAT_MIN)) * (H - PAD * 2)
-  const SPC: Record<string,string> = { 'In Control': '#34D399', 'Watch': '#F59E0B', 'Out of Control': '#F87171' }
-  const sigColor = (s: number) => s >= 4 ? '#34D399' : s >= 3 ? '#60A5FA' : s >= 2.5 ? '#F59E0B' : '#F87171'
-
-  const mapped = branches.filter(b => b.latitude && b.longitude && !isNaN(Number(b.latitude)) && !isNaN(Number(b.longitude)))
-
-  return (
-    <div style={{ background: 'rgba(15,26,40,0.85)', borderRadius: 12, padding: 12 }}>
-      <svg width="100%" viewBox={"0 0 " + W + " " + H} style={{ display: 'block' }}>
-        <rect x={0} y={0} width={W} height={H} fill="#060F1A" rx={8} />
-        <rect x={PAD} y={PAD} width={W-PAD*2} height={H-PAD*2} fill="rgba(15,28,44,0.8)" rx={4} stroke="rgba(29,158,117,0.1)" strokeWidth={0.5} />
-        {[
-          {label:'Douala', lat:4.05, lon:9.72},
-          {label:'Yaounde', lat:3.85, lon:11.52},
-          {label:'Bafoussam', lat:5.47, lon:10.42},
-          {label:'Garoua', lat:9.30, lon:13.39},
-          {label:'Maroua', lat:10.60, lon:14.32},
-        ].map(c => (
-          <g key={c.label}>
-            <circle cx={toX(c.lon)} cy={toY(c.lat)} r={2} fill="rgba(148,163,184,0.3)" />
-            <text x={toX(c.lon)+5} y={toY(c.lat)+4} fill="rgba(148,163,184,0.4)" fontSize={8}>{c.label}</text>
-          </g>
-        ))}
-        {mapped.map((b: any) => {
-          const x = toX(Number(b.longitude))
-          const y = toY(Number(b.latitude))
-          const col = SPC[b.SPC_Flag] || '#60A5FA'
-          const sig = Number(b.Sigma_Level || 0)
-          return (
-            <g key={b.Branch_ID}>
-              <circle cx={x} cy={y} r={10} fill={col + '22'} stroke={col} strokeWidth={1.5} />
-              <circle cx={x} cy={y} r={4} fill={sigColor(sig)} />
-              <text x={x} y={y - 13} textAnchor="middle" fill="#CBD5E1" fontSize={7.5} fontWeight="500">{String(b.Branch_Name || '').split(' ')[0]}</text>
-              <text x={x} y={y + 20} textAnchor="middle" fill={sigColor(sig)} fontSize={7}>σ{sig}</text>
-            </g>
-          )
-        })}
-        <text x={W/2} y={H-6} textAnchor="middle" fill="#1e3a5f" fontSize={9}>Cameroon Branch Network — {mapped.length} locations</text>
-      </svg>
-      <div style={{ display: 'flex', gap: 16, marginTop: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
-        {[['#34D399','In Control'],['#F59E0B','Watch'],['#F87171','Out of Control']].map(([c,l]) => (
-          <div key={l} style={{ display: 'flex', alignItems: 'center', gap: 5, fontSize: 10, color: '#64748B' }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: c as string, display: 'inline-block' }} />{l}
-          </div>
-        ))}
-        <div style={{ fontSize: 10, color: '#64748B' }}>· Inner dot = sigma level</div>
-      </div>
-    </div>
-  )
-}
 
 const SPC_COLOR: Record<string,string> = { 'In Control': '#34D399', 'Watch': '#F59E0B', 'Out of Control': '#F87171' }
 const sigmaColor = (s: number) => s >= 4 ? '#34D399' : s >= 3 ? '#60A5FA' : s >= 2.5 ? '#F59E0B' : '#F87171'
@@ -161,7 +105,7 @@ export default function BranchesPage() {
             </div>
           </Section>
           <Section title="Branch Performance Map — Cameroon" color="#60A5FA">
-            <CameroonMap branches={branches} />
+            <BranchGISMap branches={branches.filter((b: any) => b.latitude && b.longitude).map((b: any) => ({ branchId: b.Branch_ID, branchName: b.Branch_Name, region: b.Region, city: b.City, sigmaLevel: Number(b.Sigma_Level), spcFlag: b.SPC_Flag, slaCompliance: Number(b.sla_compliance), efficiencyScore: Number(b.efficiency_score || 0), latitude: Number(b.latitude), longitude: Number(b.longitude) }))} height={460} />
           </Section>
           {branches.length > 0 && (
             <Section title="Branch League Table" color="#60A5FA">
