@@ -45,11 +45,11 @@ export default function FraudPage() {
   useEffect(() => {
     const h = authHeader() as any
     Promise.all([
-      fetch('/api/fraud/alerts',  { headers: h }).then(r => r.json()),
-      fetch('/api/fraud/summary', { headers: h }).then(r => r.json()),
-      fetch('/api/fraud/network', { headers: h }).then(r => r.json()),
+      fetch('/api/fraud/alerts',  { headers: h }).then(r => r.json()).catch(() => []),
+      fetch('/api/fraud/summary', { headers: h }).then(r => r.json()).catch(() => []),
+      fetch('/api/fraud/network', { headers: h }).then(r => r.json()).catch(() => ({nodes:[],links:[]})),
     ]).then(([a, s, n]) => {
-      if (n?.nodes) setNetwork(n)
+      if (n && Array.isArray(n.nodes)) setNetwork(n)
       setAlerts(Array.isArray(a) ? a : [])
       setSummary(Array.isArray(s) ? s : [])
       setLoading(false)
@@ -95,7 +95,7 @@ export default function FraudPage() {
           </Section>
 
 
-          {network.nodes.length > 0 && (
+          {network.nodes.length >= 0 && (
             <Section title="AML Transaction Network" color="#818CF8">
               <AMLNetworkGraph nodes={network.nodes} links={network.links} height={420} />
             </Section>

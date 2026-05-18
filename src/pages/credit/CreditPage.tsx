@@ -21,7 +21,7 @@ function GreetingBar() {
 
 
 function StressTestPanel({ sectors }: { sectors: any[] }) {
-  const [impact, setImpact] = React.useState(0)
+  const [impact, setImpact] = useState(0)
   const baseTotalNpl = sectors.reduce((s, r) => s + Number(r.npl_count || 0), 0)
   const totalLoans   = sectors.reduce((s, r) => s + Number(r.loan_count || 1), 0)
   const simulatedNpl = (baseTotalNpl + (impact / 100) * 4).toFixed(0)

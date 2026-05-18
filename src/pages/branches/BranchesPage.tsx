@@ -45,8 +45,8 @@ export default function BranchesPage() {
   useEffect(() => {
     const h = authHeader() as any
     Promise.all([
-      fetch('/api/branches/performance', { headers: h }).then(r => r.json()),
-      fetch('/api/branches/flagged',     { headers: h }).then(r => r.json()),
+      fetch('/api/branches/performance', { headers: h }).then(r => r.json()).catch(() => []),
+      fetch('/api/branches/flagged',     { headers: h }).then(r => r.json()).catch(() => []),
     ]).then(([b, f]) => {
       setBranches(Array.isArray(b) ? b : [])
       setFlagged(Array.isArray(f) ? f : [])
