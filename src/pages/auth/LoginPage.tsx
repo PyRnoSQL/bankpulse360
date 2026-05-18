@@ -98,7 +98,14 @@ export default function LoginPage() {
   return (
     <>
       <AnimatedBackground />
-      <style>{\`@keyframes spin{to{transform:rotate(360deg)}} @keyframes pulse{0%,100%{box-shadow:0 0 20px rgba(29,158,117,0.3)}50%{box-shadow:0 0 40px rgba(29,158,117,0.6)}} .bp-input::placeholder{color:rgba(255,255,255,0.2)!important} .bp-input:focus{border-color:rgba(29,158,117,0.6)!important;background:rgba(29,158,117,0.06)!important} .bp-btn:hover:not(:disabled){transform:translateY(-1px)}\`}</style>
+      <style dangerouslySetInnerHTML={{__html:`
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @keyframes pulse{0%,100%{box-shadow:0 0 20px rgba(29,158,117,0.3)}50%{box-shadow:0 0 40px rgba(29,158,117,0.6)}}
+  @keyframes bp-bounce{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-4px);opacity:1}}
+  .bp-input::placeholder{color:rgba(255,255,255,0.2)!important}
+  .bp-input:focus{border-color:rgba(29,158,117,0.6)!important;background:rgba(29,158,117,0.06)!important}
+  .bp-btn:hover:not(:disabled){transform:translateY(-1px)}
+`}} />
       <div style={{position:'relative',zIndex:1,minHeight:'100vh',width:'100%',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',padding:'24px 16px'}}>
         <div style={{position:'fixed',top:0,left:0,right:0,display:'flex',alignItems:'center',justifyContent:'space-between',padding:'14px 28px',borderBottom:'0.5px solid rgba(255,255,255,0.06)',background:'rgba(4,15,10,0.8)',backdropFilter:'blur(12px)',zIndex:10,flexWrap:'wrap',gap:10}}>
           <div style={{display:'flex',alignItems:'center',gap:10}}>
