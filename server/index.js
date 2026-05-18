@@ -39,7 +39,5 @@ app.use(express.static(dist))
 app.get('*', (_req, res) => res.sendFile(path.join(dist, 'index.html')))
 
 app.listen(PORT, () => {
-  console.log('\n=================================')
-  console.log('  BankPulse360 running on ' + PORT)
-  console.log('=================================\n')
+  console.log('BankPulse360 running on port ' + PORT)
 })
