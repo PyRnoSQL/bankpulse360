@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import AMLNetworkGraph from '@/components/network/AMLNetworkGraph'
 import { authHeader } from '@/lib/auth'
 
 function GreetingBar() {
@@ -39,13 +40,16 @@ export default function FraudPage() {
   const [alerts,  setAlerts]  = useState<any[]>([])
   const [summary, setSummary] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [network, setNetwork] = useState<{nodes:any[];links:any[]}>({nodes:[],links:[]})
 
   useEffect(() => {
     const h = authHeader() as any
     Promise.all([
       fetch('/api/fraud/alerts',  { headers: h }).then(r => r.json()),
       fetch('/api/fraud/summary', { headers: h }).then(r => r.json()),
-    ]).then(([a, s]) => {
+      fetch('/api/fraud/network', { headers: h }).then(r => r.json()),
+    ]).then(([a, s, n]) => {
+      if (n?.nodes) setNetwork(n)
       setAlerts(Array.isArray(a) ? a : [])
       setSummary(Array.isArray(s) ? s : [])
       setLoading(false)
@@ -90,6 +94,12 @@ export default function FraudPage() {
             </div>
           </Section>
 
+
+          {network.nodes.length > 0 && (
+            <Section title="AML Transaction Network" color="#818CF8">
+              <AMLNetworkGraph nodes={network.nodes} links={network.links} height={420} />
+            </Section>
+          )}
           {alerts.length > 0 && (
             <Section title="Recent Alerts" color="#FB923C">
               <div style={{ background:'rgba(15,26,40,0.85)', border:'1px solid rgba(251,146,60,0.2)', borderRadius:14, overflow:'hidden' }}>

@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { logout, getUser } from '@/lib/auth'
+import AICopilot from '@/components/ui/AICopilot'
+import AICopilot from '@/components/ui/AICopilot'
 
 
 const PAGE_META: Record<string, { title: string; subtitle: string }> = {
@@ -297,6 +299,8 @@ export default function AppShell() {
         </div>
       </main>
 
+      <AICopilot />
+      <AICopilot />
       <style>{`
         @keyframes livepulse {
           0%,100% { opacity:1; transform:scale(1) }
