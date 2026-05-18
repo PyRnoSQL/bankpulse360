@@ -52,7 +52,7 @@ const HINTS = [
   'Customers with churn risk above 70%?',
   'List critical fraud alerts',
   'Which branches are out of control?',
-  'Montrez les prêts agricoles à risque',
+  'Montrez les prets agricoles a risque',
 ]
 
 export default function AICopilot() {
@@ -61,10 +61,10 @@ export default function AICopilot() {
   const [loading, setLoading] = useState(false)
   const [msgs, setMsgs]       = useState<Message[]>([{
     role: 'assistant',
-    content: "Hello! I'm your BankPulse 360° AI Copilot. Ask me anything about your portfolio, customers, fraud or branches — in English or French.",
+    content: "Hello! I am your BankPulse 360 AI Copilot. Ask me anything about your portfolio, customers, fraud or branches in English or French.",
   }])
-  const endRef   = useRef<HTMLDivElement>(null)
-  const inRef    = useRef<HTMLInputElement>(null)
+  const endRef = useRef<HTMLDivElement>(null)
+  const inRef  = useRef<HTMLInputElement>(null)
 
   useEffect(() => { if (open) setTimeout(() => inRef.current?.focus(), 80) }, [open])
   useEffect(() => { endRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [msgs])
@@ -77,25 +77,34 @@ export default function AICopilot() {
     setMsgs(next)
     setLoading(true)
     try {
-      const history = next.slice(0, -1).map(m => ({ role: m.role, content: m.content }))
-      const res  = await fetch('https://api.anthropic.com/v1/messages', {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || ''
+      const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey
+      const history = next.slice(1, -1).map(m => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: m.content || '' }]
+      }))
+      const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, system: SYSTEM, messages: history }),
+        body: JSON.stringify({
+          system_instruction: { parts: [{ text: SYSTEM }] },
+          contents: [...history, { role: 'user', parts: [{ text: q }] }],
+          generationConfig: { maxOutputTokens: 800, temperature: 0.3 }
+        }),
       })
       const data = await res.json()
-      const raw  = data.content?.[0]?.text || 'Sorry, I could not process that.'
+      const raw  = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Sorry, I could not process that request.'
       const { text: txt, table } = parseMsg(raw)
       setMsgs(prev => [...prev.slice(0, -1), { role: 'assistant', content: txt, table: table ?? undefined }])
     } catch {
-      setMsgs(prev => [...prev.slice(0, -1), { role: 'assistant', content: 'Connection error — please try again.' }])
+      setMsgs(prev => [...prev.slice(0, -1), { role: 'assistant', content: 'Connection error - please try again.' }])
     } finally { setLoading(false) }
   }
 
   return (
     <>
       <button onClick={() => setOpen(o => !o)} title="AI Copilot" style={{ position: 'fixed', bottom: 24, right: 24, zIndex: 1000, width: 52, height: 52, borderRadius: '50%', background: open ? '#0A1628' : 'linear-gradient(135deg,#1D9E75,#0F6E56)', border: '1px solid rgba(29,158,117,0.5)', cursor: 'pointer', boxShadow: '0 4px 20px rgba(0,0,0,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 22, color: '#fff', transition: 'all 0.2s' }}>
-        {open ? '✕' : '✦'}
+        {open ? 'x' : '✦'}
       </button>
 
       {open && (
@@ -105,7 +114,7 @@ export default function AICopilot() {
             <div style={{ width: 30, height: 30, borderRadius: 8, background: 'linear-gradient(135deg,#1D9E75,#0F6E56)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 15, flexShrink: 0 }}>✦</div>
             <div>
               <div style={{ fontSize: 12, fontWeight: 600, color: '#F1F5F9' }}>AI Copilot</div>
-              <div style={{ fontSize: 10, color: '#34D399' }}>● ONLINE · Powered by Claude</div>
+              <div style={{ fontSize: 10, color: '#34D399' }}>● ONLINE · Powered by Gemini AI</div>
             </div>
             <span style={{ marginLeft: 'auto', fontSize: 10, color: '#475569' }}>EN / FR</span>
           </div>
@@ -115,7 +124,7 @@ export default function AICopilot() {
               <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
                 <div style={{ maxWidth: m.table ? '100%' : '86%', width: m.table ? '100%' : undefined, padding: '8px 11px', borderRadius: m.role === 'user' ? '11px 11px 3px 11px' : '11px 11px 11px 3px', background: m.role === 'user' ? 'rgba(29,158,117,0.18)' : 'rgba(255,255,255,0.05)', border: '0.5px solid', borderColor: m.role === 'user' ? 'rgba(29,158,117,0.35)' : 'rgba(255,255,255,0.08)', fontSize: 12, color: '#E2E8F0', lineHeight: 1.55 }}>
                   {m.loading
-                    ? <div style={{ display: 'flex', gap: 4, padding: '2px 0' }}>{[0,1,2].map(j => <span key={j} style={{ width: 6, height: 6, borderRadius: '50%', background: '#34D399', display: 'inline-block', animation: `bp-bounce 1s ease-in-out ${j*0.15}s infinite` }} />)}</div>
+                    ? <div style={{ display: 'flex', gap: 4, padding: '2px 0' }}>{[0,1,2].map(j => <span key={j} style={{ width: 6, height: 6, borderRadius: '50%', background: '#34D399', display: 'inline-block', animation: 'bp-bounce 1s ease-in-out ' + (j*0.15) + 's infinite' }} />)}</div>
                     : <>{m.content && <div>{m.content}</div>}{m.table && <TableView rows={m.table} />}</>
                   }
                 </div>
@@ -131,13 +140,13 @@ export default function AICopilot() {
           )}
 
           <div style={{ padding: '9px 11px', borderTop: '0.5px solid rgba(255,255,255,0.07)', display: 'flex', gap: 7 }}>
-            <input ref={inRef} value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()} placeholder="Ask about loans, customers, fraud…" disabled={loading} style={{ flex: 1, padding: '7px 11px', fontSize: 12, background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#F1F5F9', outline: 'none', fontFamily: 'inherit' }} />
+            <input ref={inRef} value={input} onChange={e => setInput(e.target.value)} onKeyDown={e => e.key === 'Enter' && send()} placeholder="Ask about loans, customers, fraud..." disabled={loading} style={{ flex: 1, padding: '7px 11px', fontSize: 12, background: 'rgba(255,255,255,0.05)', border: '0.5px solid rgba(255,255,255,0.1)', borderRadius: 8, color: '#F1F5F9', outline: 'none', fontFamily: 'inherit' }} />
             <button onClick={() => send()} disabled={loading || !input.trim()} style={{ width: 32, height: 32, borderRadius: 8, background: input.trim() ? 'linear-gradient(135deg,#1D9E75,#0F6E56)' : 'rgba(255,255,255,0.06)', border: '0.5px solid rgba(29,158,117,0.3)', cursor: input.trim() ? 'pointer' : 'not-allowed', color: '#fff', fontSize: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>↑</button>
           </div>
         </div>
       )}
 
-      <style>{`@keyframes bp-bounce{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-4px);opacity:1}}`}</style>
+      <style dangerouslySetInnerHTML={{ __html: '@keyframes bp-bounce{0%,100%{transform:translateY(0);opacity:.4}50%{transform:translateY(-4px);opacity:1}}' }} />
     </>
   )
 }

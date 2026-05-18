@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import BranchGISMap from '@/components/maps/BranchGISMap'
 import { authHeader } from '@/lib/auth'
 
 function GreetingBar() {
@@ -94,6 +95,20 @@ export default function BranchesPage() {
                 </div>
               ))}
             </div>
+          </Section>
+
+          <Section title="Branch Performance Map - Cameroon" color="#60A5FA">
+            <BranchGISMap
+              branches={branches.filter((b: any) => b.latitude && b.longitude).map((b: any) => ({
+                branchId: b.Branch_ID, branchName: b.Branch_Name,
+                region: b.Region, city: b.City,
+                sigmaLevel: Number(b.Sigma_Level), spcFlag: b.SPC_Flag,
+                slaCompliance: Number(b.sla_compliance),
+                efficiencyScore: Number(b.efficiency_score || 0),
+                latitude: Number(b.latitude), longitude: Number(b.longitude),
+              }))}
+              height={380}
+            />
           </Section>
 
           {branches.length > 0 && (
