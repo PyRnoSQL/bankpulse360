@@ -1,23 +1,5 @@
 import React, { useState } from 'react';
 import {
-  Paper,
-  Typography,
-  Slider,
-  Box,
-  Grid,
-  Card,
-  CardContent,
-  Alert,
-  LinearProgress,
-  Chip,
-} from '@mui/material';
-import {
-  TrendingDown,
-  TrendingUp,
-  Warning,
-  Timeline,
-} from '@mui/icons-material';
-import {
   LineChart,
   Line,
   Area,

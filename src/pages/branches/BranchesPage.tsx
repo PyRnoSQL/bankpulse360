@@ -1,24 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Container,
-  Grid,
-  Paper,
-  Typography,
-  Box,
-  Card,
-  CardContent,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Chip,
-} from '@mui/material';
-import {
-  LocationOn,
-  Business,
-  TrendingUp,
-  People,
-} from '@mui/icons-material';
 import axios from 'axios';
 
 // Import your GIS Map component

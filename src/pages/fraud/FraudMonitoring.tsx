@@ -1,22 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Container,
-  Grid,
-  Paper,
-  Typography,
-  Box,
-  Card,
-  CardContent,
-  Chip,
-  IconButton,
-  Alert,
-} from '@mui/material';
-import {
-  Warning,
-  TrendingUp,
-  AccountBalance,
-  Timeline,
-} from '@mui/icons-material';
 import axios from 'axios';
 
 // Import your AML Network Graph component (adjust path as needed)

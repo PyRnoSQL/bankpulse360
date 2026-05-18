@@ -1,28 +1,4 @@
 import React, { useState, useRef, useEffect } from 'react';
-import {
-  Box,
-  Paper,
-  TextField,
-  IconButton,
-  Typography,
-  Collapse,
-  CircularProgress,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Alert,
-} from '@mui/material';
-import {
-  SmartToy,
-  Close,
-  Send,
-  History,
-  TableChart,
-} from '@mui/icons-material';
 import axios from 'axios';
 
 interface Message {

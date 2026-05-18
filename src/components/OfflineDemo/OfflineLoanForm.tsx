@@ -1,23 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import {
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  Box,
-  Alert,
-  Snackbar,
-  Chip,
-  CircularProgress,
-} from '@mui/material';
-import {
-  CloudOff,
-  CloudQueue,
-  Sync,
-  CheckCircle,
-  WifiOff,
-} from '@mui/icons-material';
-
 interface OfflineLoan {
   id: string;
   customerName: string;
