@@ -14,9 +14,16 @@ try {
 }
 
 export const bigquery = new BigQuery({
-  projectId: process.env.GCP_PROJECT_ID || 'bankpulse360',
+  projectId:   process.env.GCP_PROJECT_ID || 'bankpulse360',
   credentials: credentials?.client_email ? credentials : undefined,
-  location: process.env.GCP_REGION || 'africa-south1',
+  location:    process.env.GCP_REGION || 'africa-south1',
+  scopes: [
+    'https://www.googleapis.com/auth/bigquery',
+    'https://www.googleapis.com/auth/drive',
+    'https://www.googleapis.com/auth/drive.readonly',
+    'https://www.googleapis.com/auth/spreadsheets',
+    'https://www.googleapis.com/auth/spreadsheets.readonly',
+  ],
 })
 
 export const P  = process.env.GCP_PROJECT_ID || 'bankpulse360'
