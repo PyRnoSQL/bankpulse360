@@ -1,42 +1,22 @@
 import { useEffect, useState } from 'react'
 import { authHeader } from '@/lib/auth'
+import { Users, TrendingDown, AlertTriangle, Activity, Gift, Smartphone } from 'lucide-react'
+import { KPISkeletonGrid, TableSkeleton } from '@/components/ui/SkeletonCard'
 
 function GreetingBar() {
-  const user = (() => {
-    try { const t = localStorage.getItem('bp360_token'); if (!t) return null; return JSON.parse(atob(t.split('.')[1])) } catch { return null }
-  })()
-  const firstName = (user?.name || 'User').split(' ')[0]
-  const [time, setTime] = useState(''); const [date, setDate] = useState('')
-  useEffect(() => {
-    const tick = () => {
-      const n = new Date()
-      setTime(n.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }))
-      setDate(n.toLocaleDateString([], { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }))
-    }; tick(); const id = setInterval(tick, 1000); return () => clearInterval(id)
-  }, [])
+  const user = (() => { try { const t = localStorage.getItem("bp360_token"); if (!t) return null; return JSON.parse(atob(t.split(".")[1])) } catch { return null } })()
+  const firstName = (user?.name || "User").split(" ")[0]
+  const [time, setTime] = useState(""); const [date, setDate] = useState("")
+  useEffect(() => { const tick = () => { const n = new Date(); setTime(n.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" })); setDate(n.toLocaleDateString([], { weekday: "short", day: "numeric", month: "short", year: "numeric" })) }; tick(); const id = setInterval(tick, 1000); return () => clearInterval(id) }, [])
   return (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 24, paddingBottom: 16, borderBottom: '0.5px solid rgba(255,255,255,0.07)' }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24, paddingBottom: 16, borderBottom: "0.5px solid rgba(255,255,255,0.07)" }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
         <span style={{ fontSize: 20 }}>👋</span>
-        <span style={{ fontSize: 15, fontWeight: 600, color: '#34D399' }}>Hello, {firstName}!</span>
-        <span style={{ color: 'rgba(255,255,255,0.2)', fontSize: 14 }}>—</span>
-        <span style={{ fontSize: 13, color: '#64748B' }}>{date}</span>
+        <span style={{ fontSize: 15, fontWeight: 600, color: "#34D399" }}>Hello, {firstName}!</span>
+        <span style={{ color: "rgba(255,255,255,0.2)", fontSize: 14 }}>—</span>
+        <span style={{ fontSize: 13, color: "#64748B" }}>{date}</span>
       </div>
-      <span style={{ fontSize: 13, color: '#64748B', fontVariantNumeric: 'tabular-nums', letterSpacing: '0.04em', fontWeight: 500 }}>{time}</span>
-    </div>
-  )
-}
-
-function StatCard({ icon, label, value, sub, accent }: { icon: string; label: string; value: string; sub: string; accent: string }) {
-  return (
-    <div style={{ background: 'rgba(15,26,40,0.85)', border: `1px solid ${accent}28`, borderRadius: 14, padding: '18px 20px', position: 'relative', overflow: 'hidden', backdropFilter: 'blur(8px)', boxShadow: '0 4px 24px rgba(0,0,0,0.25)' }}>
-      <div style={{ position: 'absolute', top: -30, right: -30, width: 90, height: 90, borderRadius: '50%', background: accent, opacity: 0.08, filter: 'blur(24px)' }} />
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 12 }}>
-        <span style={{ fontSize: 11, color: '#94A3B8', letterSpacing: '0.06em', textTransform: 'uppercase', fontWeight: 500 }}>{label}</span>
-        <span style={{ fontSize: 18, width: 34, height: 34, borderRadius: 9, background: `${accent}18`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{icon}</span>
-      </div>
-      <div style={{ fontSize: 30, fontWeight: 700, color: '#F1F5F9', letterSpacing: '-0.02em', lineHeight: 1, marginBottom: 6 }}>{value}</div>
-      <div style={{ fontSize: 11, color: '#64748B' }}>{sub}</div>
+      <span style={{ fontSize: 13, color: "#64748B", fontVariantNumeric: "tabular-nums", letterSpacing: "0.04em", fontWeight: 500 }}>{time}</span>
     </div>
   )
 }
@@ -44,112 +24,189 @@ function StatCard({ icon, label, value, sub, accent }: { icon: string; label: st
 function Section({ title, color, children }: { title: string; color: string; children: React.ReactNode }) {
   return (
     <div style={{ marginBottom: 28 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
         <div style={{ width: 3, height: 18, borderRadius: 2, background: color }} />
-        <span style={{ fontSize: 11, fontWeight: 600, color: '#94A3B8', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{title}</span>
-        <div style={{ flex: 1, height: '0.5px', background: `${color}25` }} />
+        <span style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", letterSpacing: "0.08em", textTransform: "uppercase" }}>{title}</span>
+        <div style={{ flex: 1, height: "0.5px", background: color + "25" }} />
       </div>
       {children}
     </div>
   )
 }
 
+/* ── RFM formatter — BigQuery returns as date string e.g. "0005-05-04" ── */
+function formatRFM(raw: any): string {
+  if (!raw) return "--"
+  const s = String(raw)
+  /* If it looks like a date "0005-05-04" extract the numbers */
+  const dateMatch = s.match(/^(\d+)-(\d+)-(\d+)$/)
+  if (dateMatch) {
+    const r = parseInt(dateMatch[1], 10)
+    const f = parseInt(dateMatch[2], 10)
+    const m = parseInt(dateMatch[3], 10)
+    return r + "-" + f + "-" + m
+  }
+  return s
+}
+
+function fcfa(v: number): string {
+  if (v >= 1_000_000) return (v / 1_000_000).toFixed(1) + "M"
+  if (v >= 1_000)     return (v / 1_000).toFixed(0) + "K"
+  return String(v)
+}
+
+const SEG_COLOR: Record<string,string> = {
+  Premium:      "#818CF8",
+  "At-Risk":    "#F87171",
+  Dormant:      "#475569",
+  "Mass Market":"#60A5FA",
+}
+
 export default function CustomersPage() {
-  const [segments, setSegments] = useState<any[]>([])
-  const [churn,    setChurn]    = useState<any[]>([])
-  const [loading,  setLoading]  = useState(true)
+  const [churn,   setChurn]   = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const h = authHeader() as any
-    Promise.all([
-      fetch('/api/customers/segments', { headers: h }).then(r => r.json()),
-      fetch('/api/customers/churn-risk', { headers: h }).then(r => r.json()),
-    ]).then(([s, c]) => { setSegments(Array.isArray(s) ? s : []); setChurn(Array.isArray(c) ? c : []); setLoading(false) })
-    .catch(() => setLoading(false))
+    fetch("/api/customers/churn-risk", { headers: h })
+      .then(r => r.json())
+      .then(d => { setChurn(Array.isArray(d) ? d : []); setLoading(false) })
+      .catch(() => setLoading(false))
   }, [])
 
-  const total    = segments.reduce((s, r) => s + Number(r.count || 0), 0)
-  const premium  = segments.find(s => s.Segment === 'Premium')
-  const atRisk   = segments.find(s => s.Segment === 'At-Risk')
-  const dormant  = segments.find(s => s.Segment === 'Dormant')
+  const totalChurn  = churn.length
+  const avgChurn    = churn.length ? (churn.reduce((s,c) => s + Number(c.Churn_Prob____ || 0), 0) / churn.length).toFixed(1) : "0"
+  const dormant     = churn.filter(c => c.Segment === "Dormant").length
+  const noMobile    = churn.filter(c => !c.Mobile_Banking).length
+  const highCLV     = churn.filter(c => Number(c.CLV_Score__FCFA_ || 0) > 5_000_000).length
+  const offerPend   = churn.filter(c => c.Offer_Sent && !c.Offer_Accepted).length
 
-  const SEGMENT_COLORS: Record<string, string> = {
-    'Premium': '#818CF8', 'Mass Market': '#34D399', 'At-Risk': '#F59E0B', 'Dormant': '#64748B'
+  const COLS = [
+    { key: "Customer_ID",          label: "Customer ID",      w: 110 },
+    { key: "Full_Name",            label: "Full Name",        w: 150 },
+    { key: "Region",               label: "Region",           w: 120 },
+    { key: "City",                 label: "City",             w: 100 },
+    { key: "Neighbourhood",        label: "Neighbourhood",    w: 120 },
+    { key: "Segment",              label: "Segment",          w: 100 },
+    { key: "Age",                  label: "Age",              w: 60  },
+    { key: "Gender",               label: "Gender",           w: 70  },
+    { key: "Occupation",           label: "Occupation",       w: 140 },
+    { key: "Income_Tier",          label: "Income Tier",      w: 90  },
+    { key: "Account_Open_Date",    label: "Account Since",    w: 110 },
+    { key: "Account_Types",        label: "Account Types",    w: 180 },
+    { key: "Avg_Monthly_Bal__FCFA_",label:"Avg Bal (FCFA)",   w: 120 },
+    { key: "Products_Held",        label: "Products",         w: 80  },
+    { key: "Mobile_Banking",       label: "Mobile",           w: 70  },
+    { key: "App_Logins_30d",       label: "App Logins 30d",  w: 110 },
+    { key: "ATM_Txns_30d",         label: "ATM Txns 30d",    w: 100 },
+    { key: "Branch_Visits_30d",    label: "Branch Visits",    w: 110 },
+    { key: "Omni_Channel_Score",   label: "Omni Score",       w: 90  },
+    { key: "Days_Since_Last_Txn",  label: "Days Inactive",    w: 100 },
+    { key: "Churn_Prob____",       label: "Churn Prob %",     w: 100 },
+    { key: "CLV_Score__FCFA_",     label: "CLV (FCFA)",       w: 110 },
+    { key: "NPS_Score",            label: "NPS",              w: 60  },
+    { key: "RFM_Score",            label: "RFM Score",        w: 90  },
+    { key: "Recommended_Product",  label: "Recommendation",   w: 160 },
+    { key: "Offer_Sent",           label: "Offer Sent",       w: 90  },
+    { key: "Offer_Accepted",       label: "Offer Accepted",   w: 110 },
+  ]
+
+  function renderCell(col: typeof COLS[0], row: any) {
+    const v = row[col.key]
+    if (col.key === "Churn_Prob____") {
+      const n = Number(v || 0)
+      const c = n >= 70 ? "#F87171" : n >= 50 ? "#F59E0B" : "#34D399"
+      return <span style={{ color: c, fontWeight: 700, fontVariantNumeric: "tabular-nums" }}>{n}%</span>
+    }
+    if (col.key === "Segment") {
+      const c = SEG_COLOR[v] || "#64748B"
+      return <span style={{ padding: "2px 8px", borderRadius: 8, fontSize: 10, fontWeight: 600, background: c + "18", color: c, border: "0.5px solid " + c + "40", whiteSpace: "nowrap" }}>{v}</span>
+    }
+    if (col.key === "Mobile_Banking" || col.key === "Offer_Sent" || col.key === "Offer_Accepted") {
+      return <span style={{ color: v ? "#34D399" : "#F87171", fontWeight: 600 }}>{v ? "Yes" : "No"}</span>
+    }
+    if (col.key === "CLV_Score__FCFA_" || col.key === "Avg_Monthly_Bal__FCFA_") {
+      return <span style={{ fontVariantNumeric: "tabular-nums", color: "#E2E8F0" }}>{fcfa(Number(v || 0))}</span>
+    }
+    if (col.key === "RFM_Score") return <span style={{ fontFamily: "monospace", color: "#818CF8", fontWeight: 600 }}>{formatRFM(v)}</span>
+    if (col.key === "NPS_Score") {
+      const n = Number(v || 0)
+      return <span style={{ color: n >= 8 ? "#34D399" : n >= 6 ? "#F59E0B" : "#F87171", fontWeight: 600 }}>{n}</span>
+    }
+    if (col.key === "Recommended_Product") return <span style={{ color: "#60A5FA", fontSize: 11 }}>{v}</span>
+    if (col.key === "Omni_Channel_Score") return <span style={{ color: "#94A3B8" }}>{Number(v || 0).toFixed(1)}</span>
+    if (col.key === "Days_Since_Last_Txn") {
+      const n = Number(v || 0)
+      return <span style={{ color: n > 90 ? "#F87171" : n > 30 ? "#F59E0B" : "#34D399", fontWeight: 600, fontVariantNumeric: "tabular-nums" }}>{n}d</span>
+    }
+    return <span style={{ color: "#E2E8F0", whiteSpace: "nowrap" }}>{v === null || v === undefined ? "--" : String(v)}</span>
   }
 
   return (
-    <div style={{ minHeight: '100%', background: 'linear-gradient(160deg,#060F1A 0%,#0A1628 40%,#06120E 100%)', margin: -24, padding: '20px 24px 24px' }}>
+    <div style={{ minHeight: "100%", background: "linear-gradient(160deg,#060F1A 0%,#0A1628 40%,#06120E 100%)", margin: -24, padding: "20px 24px 24px" }}>
       <GreetingBar />
-
-      {loading && <div style={{ color: '#475569', fontSize: 13, padding: '40px 0', display: 'flex', alignItems: 'center', gap: 10 }}><span style={{ width: 16, height: 16, border: '2px solid #1D9E75', borderTopColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.8s linear infinite' }} />Loading customer data…</div>}
-
+      {loading && <div><KPISkeletonGrid count={6} /><TableSkeleton rows={6} /></div>}
       {!loading && (
         <>
-          {/* KPI strip */}
-          <Section title="Key Metrics" color="#818CF8">
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 12 }}>
-              <StatCard icon="👤" label="Total Customers"     value={String(total || '--')}                          sub="across all regions"         accent="#818CF8" />
-              <StatCard icon="💎" label="Premium Clients"     value={String(premium?.count || '--')}                sub="high-value segment"         accent="#A78BFA" />
-              <StatCard icon="⚠️" label="At-Risk Accounts"   value={String(atRisk?.count || '--')}                 sub="churn probability ≥ 50%"    accent="#F59E0B" />
-              <StatCard icon="💤" label="Dormant Accounts"   value={String(dormant?.count || '--')}                sub="inactive customers"         accent="#64748B" />
-              <StatCard icon="📱" label="Digital Adoption"   value="53%"                                            sub="mobile banking active"      accent="#34D399" />
-              <StatCard icon="🎯" label="NBO Conversion"     value="36%"                                            sub="offer acceptance rate"      accent="#60A5FA" />
+          <Section title="High Churn Risk — Summary" color="#F87171">
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(145px,1fr))", gap: 12 }}>
+              {[
+                { icon:<AlertTriangle size={14}/>, label:"At-Risk Accounts",   value:String(totalChurn),     sub:"churn prob >= 50%",    accent:"#F87171" },
+                { icon:<Activity size={14}/>,      label:"Avg Churn Prob",     value:avgChurn+"%",           sub:"portfolio average",    accent:"#F59E0B" },
+                { icon:<Users size={14}/>,         label:"Dormant Accounts",   value:String(dormant),        sub:"no recent activity",   accent:"#475569" },
+                { icon:<Smartphone size={14}/>,    label:"No Mobile Banking",  value:String(noMobile),       sub:"digital gap",          accent:"#60A5FA" },
+                { icon:<TrendingDown size={14}/>,  label:"High CLV at Risk",   value:String(highCLV),        sub:"CLV > 5M FCFA",        accent:"#818CF8" },
+                { icon:<Gift size={14}/>,          label:"Offers Pending",     value:String(offerPend),      sub:"sent but not accepted",accent:"#34D399" },
+              ].map(k => (
+                <div key={k.label} style={{ background:"rgba(15,26,40,0.85)", border:"1px solid "+k.accent+"28", borderRadius:14, padding:"14px 16px", position:"relative", overflow:"hidden" }}>
+                  <div style={{ position:"absolute", top:-24, right:-24, width:70, height:70, borderRadius:"50%", background:k.accent, opacity:0.07, filter:"blur(16px)" }} />
+                  <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
+                    <span style={{ fontSize:10, color:"#94A3B8", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase" }}>{k.label}</span>
+                    <span style={{ color:k.accent, opacity:0.8 }}>{k.icon}</span>
+                  </div>
+                  <div style={{ fontSize:24, fontWeight:700, color:"#F1F5F9", marginBottom:3 }}>{k.value}</div>
+                  <div style={{ fontSize:11, color:"#64748B" }}>{k.sub}</div>
+                </div>
+              ))}
             </div>
           </Section>
 
-          {/* Segment breakdown */}
-          {segments.length > 0 && (
-            <Section title="Segment Distribution" color="#34D399">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(200px,1fr))', gap: 10 }}>
-                {segments.map((s: any) => {
-                  const pct = total > 0 ? Math.round((s.count / total) * 100) : 0
-                  const color = SEGMENT_COLORS[s.Segment] || '#60A5FA'
-                  return (
-                    <div key={s.Segment} style={{ background: 'rgba(15,26,40,0.85)', border: `1px solid ${color}28`, borderRadius: 12, padding: '14px 16px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 10 }}>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: '#F1F5F9' }}>{s.Segment}</span>
-                        <span style={{ fontSize: 13, fontWeight: 700, color }}>   {pct}%</span>
-                      </div>
-                      <div style={{ height: 4, background: 'rgba(255,255,255,0.06)', borderRadius: 2, marginBottom: 8 }}>
-                        <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 2, transition: 'width 0.8s ease' }} />
-                      </div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <span style={{ fontSize: 11, color: '#64748B' }}>{s.count} customers</span>
-                        <span style={{ fontSize: 11, color: '#64748B' }}>Avg CLV: {s.avg_clv_m}M</span>
-                      </div>
-                    </div>
-                  )
-                })}
+          <Section title="High Churn Risk Accounts — Full Profile" color="#F87171">
+            <div style={{ background:"rgba(15,26,40,0.85)", border:"1px solid rgba(248,113,113,0.2)", borderRadius:14, overflow:"hidden" }}>
+              <div style={{ overflowX:"auto", overflowY:"auto", maxHeight:480 }}>
+                <table style={{ width:"100%", borderCollapse:"collapse", fontSize:11, minWidth: COLS.reduce((s,c)=>s+c.w,0) }}>
+                  <thead>
+                    <tr style={{ background:"rgba(15,26,40,0.98)" }}>
+                      {COLS.map(col => (
+                        <th key={col.key} style={{ padding:"10px 12px", textAlign:"left", fontSize:10, color:"#64748B", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", borderBottom:"1px solid rgba(255,255,255,0.1)", whiteSpace:"nowrap", minWidth:col.w, position:"sticky", top:0, background:"rgba(15,26,40,0.98)", zIndex:2 }}>
+                          {col.label}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {churn.map((row, i) => (
+                      <tr key={i} style={{ borderBottom:"0.5px solid rgba(255,255,255,0.04)", transition:"background 0.15s" }}
+                        onMouseEnter={e=>(e.currentTarget as HTMLTableRowElement).style.background="rgba(29,158,117,0.05)"}
+                        onMouseLeave={e=>(e.currentTarget as HTMLTableRowElement).style.background="transparent"}>
+                        {COLS.map(col => (
+                          <td key={col.key} style={{ padding:"9px 12px", whiteSpace:"nowrap", verticalAlign:"middle" }}>
+                            {renderCell(col, row)}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
-            </Section>
-          )}
-
-          {/* Churn risk table */}
-          {churn.length > 0 && (
-            <Section title="High Churn Risk Accounts" color="#F59E0B">
-              <div style={{ background: 'rgba(15,26,40,0.85)', border: '1px solid rgba(245,158,11,0.2)', borderRadius: 14, overflow: 'hidden' }}>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 100px 120px', padding: '10px 16px', borderBottom: '0.5px solid rgba(255,255,255,0.07)', background: 'rgba(255,255,255,0.03)' }}>
-                  {['Customer', 'Region', 'Segment', 'Churn %', 'Recommendation'].map(h => (
-                    <span key={h} style={{ fontSize: 10, color: '#64748B', fontWeight: 600, letterSpacing: '0.06em', textTransform: 'uppercase' }}>{h}</span>
-                  ))}
-                </div>
-                {churn.slice(0, 8).map((c: any, i: number) => (
-                  <div key={i} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 100px 120px', padding: '10px 16px', borderBottom: '0.5px solid rgba(255,255,255,0.04)', alignItems: 'center' }}>
-                    <span style={{ fontSize: 12, color: '#E2E8F0', fontWeight: 500 }}>{c.Full_Name}</span>
-                    <span style={{ fontSize: 11, color: '#64748B' }}>{c.Region}</span>
-                    <span style={{ fontSize: 11 }}>
-                      <span style={{ padding: '2px 8px', borderRadius: 8, fontSize: 10, background: 'rgba(245,158,11,0.12)', color: '#F59E0B', border: '0.5px solid rgba(245,158,11,0.3)' }}>{c.Segment}</span>
-                    </span>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: Number(c.Churn_Prob____) >= 70 ? '#F87171' : '#F59E0B' }}>{c.Churn_Prob____}%</span>
-                    <span style={{ fontSize: 10, color: '#94A3B8' }}>{c.Recommended_Product}</span>
-                  </div>
-                ))}
+              <div style={{ padding:"8px 14px", borderTop:"0.5px solid rgba(255,255,255,0.06)", fontSize:10, color:"#334155" }}>
+                {churn.length} accounts · Scroll horizontally to see all columns · Click column headers to sort
               </div>
-            </Section>
-          )}
+            </div>
+          </Section>
         </>
       )}
-      <style>{`@keyframes spin { to { transform: rotate(360deg) } }`}</style>
+      <style dangerouslySetInnerHTML={{ __html:"@keyframes spin{to{transform:rotate(360deg)}}" }} />
     </div>
   )
 }

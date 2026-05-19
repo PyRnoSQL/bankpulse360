@@ -318,36 +318,79 @@ export default function CreditPage() {
           {ews.length > 0 && (
             <Section title="Early Warning System — Click any loan to open XAI decision panel" color="#F87171">
               <div style={{ background:"rgba(15,26,40,0.85)", border:"1px solid rgba(248,113,113,0.2)", borderRadius:14, overflow:"hidden" }}>
-                <div style={{ display:"grid", gridTemplateColumns:"1.5fr 1fr 80px 80px 80px 90px 32px", padding:"10px 16px", borderBottom:"0.5px solid rgba(255,255,255,0.07)", background:"rgba(255,255,255,0.03)" }}>
-                  {["Client","Sector","PD %","DPD","Stage","EWS Flag",""].map(h => (
-                    <span key={h} style={{ fontSize:10, color:"#64748B", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase" }}>{h}</span>
-                  ))}
+                <div style={{ overflowX:"auto", overflowY:"auto", maxHeight:420 }}>
+                  <table style={{ width:"100%", borderCollapse:"collapse", fontSize:11, minWidth:1100 }}>
+                    <thead>
+                      <tr style={{ background:"rgba(15,26,40,0.98)" }}>
+                        {[
+                          {label:"Loan ID",       w:120},
+                          {label:"Client",        w:150},
+                          {label:"Region",        w:120},
+                          {label:"City",          w:100},
+                          {label:"Sector",        w:110},
+                          {label:"Loan Type",     w:110},
+                          {label:"Outstanding",   w:120},
+                          {label:"DPD",           w:70},
+                          {label:"PD %",          w:70},
+                          {label:"Stage",         w:70},
+                          {label:"Coverage %",    w:100},
+                          {label:"Classification",w:120},
+                          {label:"EWS Flag",      w:90},
+                          {label:"Rel. Manager",  w:140},
+                          {label:"Branch",        w:140},
+                        ].map(h => (
+                          <th key={h.label} style={{ padding:"10px 12px", textAlign:"left", fontSize:10, color:"#64748B", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", borderBottom:"1px solid rgba(255,255,255,0.1)", whiteSpace:"nowrap", minWidth:h.w, position:"sticky", top:0, background:"rgba(15,26,40,0.98)", zIndex:2 }}>
+                            {h.label}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {ews.map((r: any, i: number) => (
+                        <tr key={i} onClick={() => setSelected(r)} style={{ borderBottom:"0.5px solid rgba(255,255,255,0.04)", cursor:"pointer", transition:"background 0.15s" }}
+                          onMouseEnter={e=>(e.currentTarget as HTMLTableRowElement).style.background="rgba(29,158,117,0.06)"}
+                          onMouseLeave={e=>(e.currentTarget as HTMLTableRowElement).style.background="transparent"}>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
+                            <span style={{ fontSize:11, color:"#60A5FA", fontFamily:"monospace" }}>{r.Loan_ID}</span>
+                          </td>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
+                            <div style={{ fontSize:12, color:"#34D399", fontWeight:600 }}>{r.Client_Name}</div>
+                          </td>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{r.Region}</td>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#64748B" }}>{r.City}</td>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#E2E8F0" }}>{r.Sector}</td>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{r.Loan_Type}</td>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#E2E8F0", fontVariantNumeric:"tabular-nums" }}>
+                            {(Number(r.Outstanding_Bal__FCFA_||0)/1000000).toFixed(1)}M
+                          </td>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
+                            <span style={{ fontWeight:700, color:Number(r.Days_Past_Due)>60?"#F87171":Number(r.Days_Past_Due)>30?"#F59E0B":"#94A3B8", fontVariantNumeric:"tabular-nums" }}>{r.Days_Past_Due}d</span>
+                          </td>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
+                            <span style={{ fontWeight:700, color:Number(r.PD_Score____)>30?"#F87171":Number(r.PD_Score____)>15?"#F59E0B":"#34D399", fontVariantNumeric:"tabular-nums" }}>{r.PD_Score____}%</span>
+                          </td>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
+                            <span style={{ padding:"2px 7px", borderRadius:6, fontSize:10, fontWeight:700, background:r.IFRS9_Stage==="3"?"rgba(248,113,113,0.15)":r.IFRS9_Stage==="2"?"rgba(245,158,11,0.15)":"rgba(52,211,153,0.12)", color:r.IFRS9_Stage==="3"?"#F87171":r.IFRS9_Stage==="2"?"#F59E0B":"#34D399" }}>S{r.IFRS9_Stage}</span>
+                          </td>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
+                            <span style={{ fontWeight:600, color:Number(r.Coverage_Ratio____)>=80?"#34D399":Number(r.Coverage_Ratio____)>=60?"#F59E0B":"#F87171", fontVariantNumeric:"tabular-nums" }}>{r.Coverage_Ratio____}%</span>
+                          </td>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
+                            <span style={{ padding:"2px 8px", borderRadius:6, fontSize:10, fontWeight:600, background:r.Loan_Classification==="Loss"?"rgba(248,113,113,0.15)":r.Loan_Classification==="Doubtful"?"rgba(251,146,60,0.15)":r.Loan_Classification==="Substandard"?"rgba(245,158,11,0.15)":"rgba(52,211,153,0.12)", color:r.Loan_Classification==="Loss"?"#F87171":r.Loan_Classification==="Doubtful"?"#FB923C":r.Loan_Classification==="Substandard"?"#F59E0B":"#34D399" }}>{r.Loan_Classification}</span>
+                          </td>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
+                            <span style={{ padding:"2px 8px", borderRadius:6, fontSize:10, fontWeight:600, background:(EWS_COLOR[r.EWS_Flag]||"#64748B")+"15", color:EWS_COLOR[r.EWS_Flag]||"#64748B", border:"0.5px solid "+(EWS_COLOR[r.EWS_Flag]||"#64748B")+"40" }}>{r.EWS_Flag}</span>
+                          </td>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{r.Relationship_Manager}</td>
+                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#64748B" }}>{r.Branch}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-                {ews.slice(0,10).map((r: any, i: number) => (
-                  <div key={i} onClick={() => setSelected(r)}
-                    style={{ display:"grid", gridTemplateColumns:"1.5fr 1fr 80px 80px 80px 90px 32px", padding:"11px 16px", borderBottom:"0.5px solid rgba(255,255,255,0.04)", alignItems:"center", cursor:"pointer", transition:"background 0.15s" }}
-                    onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.background = "rgba(29,158,117,0.06)"}
-                    onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.background = "transparent"}>
-                    <div>
-                      <div style={{ fontSize:12, color:"#34D399", fontWeight:600 }}>{r.Client_Name}</div>
-                      <div style={{ fontSize:10, color:"#475569" }}>{r.Loan_ID}</div>
-                    </div>
-                    <span style={{ fontSize:11, color:"#64748B" }}>{r.Sector}</span>
-                    <span style={{ fontSize:12, fontWeight:700, color:Number(r.PD_Score____)>25?"#F87171":"#F59E0B", fontVariantNumeric:"tabular-nums" }}>{r.PD_Score____}%</span>
-                    <span style={{ fontSize:11, color:"#94A3B8" }}>{r.Days_Past_Due}d</span>
-                    <span style={{ padding:"2px 7px", borderRadius:8, fontSize:10, fontWeight:600,
-                      background:r.IFRS9_Stage==="3"?"rgba(248,113,113,0.15)":r.IFRS9_Stage==="2"?"rgba(245,158,11,0.15)":"rgba(52,211,153,0.12)",
-                      color:r.IFRS9_Stage==="3"?"#F87171":r.IFRS9_Stage==="2"?"#F59E0B":"#34D399" }}>S{r.IFRS9_Stage}</span>
-                    <span style={{ padding:"2px 8px", borderRadius:8, fontSize:10, fontWeight:600,
-                      background:(EWS_COLOR[r.EWS_Flag]||"#64748B")+"15",
-                      color:EWS_COLOR[r.EWS_Flag]||"#64748B",
-                      border:"0.5px solid "+(EWS_COLOR[r.EWS_Flag]||"#64748B")+"40" }}>{r.EWS_Flag}</span>
-                    <ChevronRight size={14} color="#34D399" style={{ opacity: 0.6 }} />
-                  </div>
-                ))}
-              </div>
-              <div style={{ marginTop:10, fontSize:11, color:"#334155", textAlign:"center" }}>
-                Click any row to view XAI decision explainer with risk rationale
+                <div style={{ padding:"8px 14px", borderTop:"0.5px solid rgba(255,255,255,0.06)", fontSize:10, color:"#334155" }}>
+                  {ews.length} alerts · Scroll to see all columns · Click any row to open XAI decision panel
+                </div>
               </div>
             </Section>
           )}
