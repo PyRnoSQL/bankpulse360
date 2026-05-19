@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { authHeader } from '@/lib/auth'
+import { DataViewer } from '@/components/ui/DataViewer'
 import { KPISkeletonGrid, TableSkeleton } from '@/components/ui/SkeletonCard'
 import { AlertTriangle, TrendingDown, TrendingUp, Shield, DollarSign, Activity, ChevronRight } from 'lucide-react'
 

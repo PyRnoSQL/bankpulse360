@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { authHeader } from '@/lib/auth'
+import { DataViewer } from '@/components/ui/DataViewer'
 import { KPISkeletonGrid, MapSkeleton, TableSkeleton } from '@/components/ui/SkeletonCard'
 import { MapPin, Activity, AlertTriangle, Users, Clock, TrendingUp } from 'lucide-react'
 
@@ -250,82 +251,33 @@ export default function BranchesPage() {
 
           {branches.length > 0 && (
             <Section title="Branch League Table — Full Performance Data" color="#60A5FA">
-              <div style={{ background:"rgba(15,26,40,0.85)", border:"1px solid rgba(96,165,250,0.2)", borderRadius:14, overflow:"hidden" }}>
-                <div style={{ overflowX:"auto", overflowY:"auto", maxHeight:460 }}>
-                  <table style={{ width:"100%", borderCollapse:"collapse", fontSize:11, minWidth:1400 }}>
-                    <thead>
-                      <tr style={{ background:"rgba(15,26,40,0.98)" }}>
-                        {[
-                          {label:"Branch ID",        w:100},
-                          {label:"Branch Name",      w:150},
-                          {label:"Region",           w:120},
-                          {label:"City",             w:100},
-                          {label:"Tier",             w:90},
-                          {label:"Sigma",            w:80},
-                          {label:"SPC Flag",         w:130},
-                          {label:"Avg Svc (min)",    w:110},
-                          {label:"P90 Svc (min)",    w:110},
-                          {label:"SLA %",            w:80},
-                          {label:"Teller Util %",    w:110},
-                          {label:"Error Rate %",     w:100},
-                          {label:"ATM Uptime %",     w:110},
-                          {label:"Loan TAT (days)",  w:120},
-                          {label:"Customers",        w:100},
-                          {label:"Total Txns",       w:100},
-                          {label:"Queue Abnd.",      w:100},
-                          {label:"Eff. Score",       w:90},
-                        ].map(h => (
-                          <th key={h.label} style={{ padding:"10px 12px", textAlign:"left", fontSize:10, color:"#64748B", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", borderBottom:"1px solid rgba(255,255,255,0.1)", whiteSpace:"nowrap", minWidth:h.w, position:"sticky", top:0, background:"rgba(15,26,40,0.98)", zIndex:2 }}>
-                            {h.label}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {branches.map((b: any, i: number) => (
-                        <tr key={i} style={{ borderBottom:"0.5px solid rgba(255,255,255,0.04)", transition:"background 0.15s" }}
-                          onMouseEnter={e=>(e.currentTarget as HTMLTableRowElement).style.background="rgba(96,165,250,0.05)"}
-                          onMouseLeave={e=>(e.currentTarget as HTMLTableRowElement).style.background="transparent"}>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontFamily:"monospace", fontSize:10, color:"#64748B" }}>{b.Branch_ID}</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
-                            <div style={{ fontSize:12, color:"#E2E8F0", fontWeight:500 }}>{b.Branch_Name}</div>
-                          </td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{b.Region}</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#64748B" }}>{b.City}</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ padding:"2px 7px", borderRadius:6, fontSize:10, fontWeight:600, background:b.Branch_Tier==="Premium"?"rgba(129,140,248,0.15)":b.Branch_Tier==="Standard"?"rgba(96,165,250,0.15)":"rgba(100,116,139,0.15)", color:b.Branch_Tier==="Premium"?"#818CF8":b.Branch_Tier==="Standard"?"#60A5FA":"#64748B" }}>{b.Branch_Tier}</span>
-                          </td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ fontSize:13, fontWeight:700, color:sigmaColor(Number(b.Sigma_Level)) }}>{b.Sigma_Level}σ</span>
-                          </td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ padding:"2px 8px", borderRadius:6, fontSize:10, fontWeight:600, background:(SPC_COLOR[b.SPC_Flag]||"#64748B")+"15", color:SPC_COLOR[b.SPC_Flag]||"#64748B", border:"0.5px solid "+(SPC_COLOR[b.SPC_Flag]||"#64748B")+"40" }}>{b.SPC_Flag}</span>
-                          </td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontVariantNumeric:"tabular-nums", color:Number(b.avg_service_time)<=8?"#34D399":Number(b.avg_service_time)<=12?"#F59E0B":"#F87171", fontWeight:600 }}>{b.avg_service_time}</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontVariantNumeric:"tabular-nums", fontSize:11, color:"#94A3B8" }}>{b.p90_service_time}</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ fontWeight:600, fontVariantNumeric:"tabular-nums", color:Number(b.sla_compliance)>=90?"#34D399":Number(b.sla_compliance)>=75?"#F59E0B":"#F87171" }}>{b.sla_compliance}%</span>
-                          </td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontVariantNumeric:"tabular-nums", color:Number(b.teller_utilisation)>=85?"#34D399":Number(b.teller_utilisation)>=70?"#F59E0B":"#F87171", fontWeight:600 }}>{b.teller_utilisation}%</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontVariantNumeric:"tabular-nums", color:Number(b.teller_error_rate)<=1?"#34D399":Number(b.teller_error_rate)<=3?"#F59E0B":"#F87171", fontWeight:600 }}>{b.teller_error_rate}%</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontVariantNumeric:"tabular-nums", color:Number(b.atm_uptime)>=98?"#34D399":Number(b.atm_uptime)>=92?"#F59E0B":"#F87171", fontWeight:600 }}>{b.atm_uptime}%</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontVariantNumeric:"tabular-nums", color:Number(b.loan_tat)<=3?"#34D399":Number(b.loan_tat)<=5?"#F59E0B":"#F87171", fontWeight:600 }}>{b.loan_tat}</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontVariantNumeric:"tabular-nums", fontSize:11, color:"#E2E8F0", fontWeight:500 }}>{b.Customers_Served}</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontVariantNumeric:"tabular-nums", fontSize:11, color:"#94A3B8" }}>{b.Total_Txns}</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontVariantNumeric:"tabular-nums", color:Number(b.Queue_Abandonment)<=5?"#34D399":Number(b.Queue_Abandonment)<=10?"#F59E0B":"#F87171", fontWeight:600 }}>{b.Queue_Abandonment}</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ fontWeight:700, fontVariantNumeric:"tabular-nums", color:Number(b.efficiency_score)>=80?"#34D399":Number(b.efficiency_score)>=65?"#F59E0B":"#F87171" }}>{b.efficiency_score}</span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <div style={{ padding:"8px 14px", borderTop:"0.5px solid rgba(255,255,255,0.06)", fontSize:10, color:"#334155" }}>
-                  {branches.length} branches · All performance columns · Scroll horizontally and vertically · Color = performance threshold
-                </div>
-              </div>
-            </Section>
+            <DataViewer
+              sheetName="BP360_M4_Branch_Operations"
+              description="KPIs: service time, sigma level, teller productivity, loan TAT, SPC flags"
+              accentColor="#60A5FA"
+              rows={branches}
+              columns={[
+                { key:"Branch_ID",         label:"Branch ID",       width:100, render:(v)=><span style={{fontFamily:"monospace",fontSize:10,color:"#64748B"}}>{v}</span> },
+                { key:"Branch_Name",       label:"Branch Name",     width:150, render:(v)=><span style={{color:"#E2E8F0",fontWeight:600}}>{v}</span> },
+                { key:"Region",            label:"Region",          width:120 },
+                { key:"City",              label:"City",            width:100 },
+                { key:"Branch_Tier",       label:"Branch Tier",     width:100, render:(v)=>{ const c=v==="Premium"?"#818CF8":v==="Flagship"?"#F59E0B":v==="Standard"?"#60A5FA":"#64748B"; return <span style={{padding:"2px 7px",borderRadius:6,fontSize:10,fontWeight:600,background:c+"18",color:c}}>{v}</span> } },
+                { key:"Sigma_Level",       label:"Sigma",           width:80,  render:(v)=>{ const n=Number(v); const c=n>=4?"#34D399":n>=3?"#60A5FA":n>=2.5?"#F59E0B":"#F87171"; return <span style={{fontWeight:700,color:c}}>{v}σ</span> } },
+                { key:"SPC_Flag",          label:"SPC Flag",        width:130, render:(v)=>{ const c={"In Control":"#34D399","Watch":"#F59E0B","Out of Control":"#F87171"}[v as string]||"#64748B"; return <span style={{padding:"2px 8px",borderRadius:6,fontSize:10,fontWeight:600,background:c+"15",color:c,border:"0.5px solid "+c+"40"}}>{v}</span> } },
+                { key:"avg_service_time",  label:"Avg Svc (min)",   width:120, render:(v)=><span style={{fontWeight:600,color:Number(v)<=8?"#34D399":Number(v)<=12?"#F59E0B":"#F87171"}}>{v}</span> },
+                { key:"p90_service_time",  label:"P90 Svc (min)",   width:120, render:(v)=><span style={{color:"#94A3B8"}}>{v}</span> },
+                { key:"sla_compliance",    label:"SLA %",           width:80,  render:(v)=><span style={{fontWeight:600,color:Number(v)>=90?"#34D399":Number(v)>=75?"#F59E0B":"#F87171"}}>{v}%</span> },
+                { key:"teller_utilisation",label:"Teller Util %",   width:110, render:(v)=><span style={{fontWeight:600,color:Number(v)>=85?"#34D399":Number(v)>=70?"#F59E0B":"#F87171"}}>{v}%</span> },
+                { key:"teller_error_rate", label:"Error Rate %",    width:110, render:(v)=><span style={{fontWeight:600,color:Number(v)<=1?"#34D399":Number(v)<=3?"#F59E0B":"#F87171"}}>{v}%</span> },
+                { key:"atm_uptime",        label:"ATM Uptime %",    width:110, render:(v)=><span style={{fontWeight:600,color:Number(v)>=98?"#34D399":Number(v)>=92?"#F59E0B":"#F87171"}}>{v}%</span> },
+                { key:"loan_tat",          label:"Loan TAT (days)", width:120, render:(v)=><span style={{fontWeight:600,color:Number(v)<=3?"#34D399":Number(v)<=5?"#F59E0B":"#F87171"}}>{v}</span> },
+                { key:"Customers_Served",  label:"Customers",       width:100, render:(v)=><span style={{fontVariantNumeric:"tabular-nums",fontWeight:500,color:"#E2E8F0"}}>{v}</span> },
+                { key:"Total_Txns",        label:"Total Txns",      width:100, render:(v)=><span style={{fontVariantNumeric:"tabular-nums",color:"#94A3B8"}}>{v}</span> },
+                { key:"Queue_Abandonment", label:"Queue Abnd.",     width:110, render:(v)=><span style={{fontWeight:600,color:Number(v)<=5?"#34D399":Number(v)<=10?"#F59E0B":"#F87171"}}>{v}</span> },
+                { key:"efficiency_score",  label:"Eff. Score",      width:100, render:(v)=><span style={{fontWeight:700,color:Number(v)>=80?"#34D399":Number(v)>=65?"#F59E0B":"#F87171"}}>{v}</span> },
+              ]}
+            />
+          </Section>
           )}
 
           {flagged.length > 0 && (

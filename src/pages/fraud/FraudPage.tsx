@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { authHeader } from '@/lib/auth'
+import { DataViewer } from '@/components/ui/DataViewer'
 import { KPISkeletonGrid, NetworkSkeleton, TableSkeleton } from '@/components/ui/SkeletonCard'
 import { AlertTriangle, Shield, Zap, Clock, Smartphone, Ban } from 'lucide-react'
 
@@ -318,98 +319,42 @@ export default function FraudPage() {
 
           {alerts.length > 0 && (
             <Section title="Recent Alerts — Full Detail" color="#FB923C">
-              <div style={{ background:"rgba(15,26,40,0.85)", border:"1px solid rgba(251,146,60,0.2)", borderRadius:14, overflow:"hidden" }}>
-                <div style={{ overflowX:"auto", overflowY:"auto", maxHeight:440 }}>
-                  <table style={{ width:"100%", borderCollapse:"collapse", fontSize:11, minWidth:1600 }}>
-                    <thead>
-                      <tr style={{ background:"rgba(15,26,40,0.98)" }}>
-                        {[
-                          {label:"Alert ID",        w:130},
-                          {label:"Account ID",      w:110},
-                          {label:"Customer",        w:150},
-                          {label:"Region",          w:120},
-                          {label:"City",            w:100},
-                          {label:"Date",            w:100},
-                          {label:"Time",            w:70},
-                          {label:"Channel",         w:90},
-                          {label:"Txn Type",        w:150},
-                          {label:"Amount (FCFA)",   w:120},
-                          {label:"Counterparty",    w:130},
-                          {label:"Country",         w:100},
-                          {label:"Fraud Score",     w:100},
-                          {label:"Band",            w:90},
-                          {label:"Alert Type",      w:160},
-                          {label:"AML Typology",    w:140},
-                          {label:"Risk Tier",       w:90},
-                          {label:"SIM Swap",        w:90},
-                          {label:"New Benef.",      w:90},
-                          {label:"Velocity",        w:80},
-                          {label:"Sanctions",       w:90},
-                          {label:"PEP Linked",      w:90},
-                          {label:"Case Status",     w:120},
-                          {label:"SAR Required",    w:100},
-                          {label:"SAR Filed",       w:100},
-                          {label:"MTTD (min)",      w:90},
-                          {label:"Investigator",    w:140},
-                        ].map(h => (
-                          <th key={h.label} style={{ padding:"10px 12px", textAlign:"left", fontSize:10, color:"#64748B", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", borderBottom:"1px solid rgba(255,255,255,0.1)", whiteSpace:"nowrap", minWidth:h.w, position:"sticky", top:0, background:"rgba(15,26,40,0.98)", zIndex:2 }}>
-                            {h.label}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {alerts.map((a: any, i: number) => (
-                        <tr key={i} style={{ borderBottom:"0.5px solid rgba(255,255,255,0.04)", transition:"background 0.15s" }}
-                          onMouseEnter={e=>(e.currentTarget as HTMLTableRowElement).style.background="rgba(251,146,60,0.05)"}
-                          onMouseLeave={e=>(e.currentTarget as HTMLTableRowElement).style.background="transparent"}>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontFamily:"monospace", fontSize:10, color:"#60A5FA" }}>{a.Alert_ID}</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontFamily:"monospace", fontSize:10, color:"#64748B" }}>{a.Account_ID}</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontSize:12, color:"#E2E8F0", fontWeight:500 }}>{a.Customer_Name}</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{a.Region}</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontSize:11, color:"#64748B" }}>{a.City}</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{a.Alert_Date}</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontSize:11, color:"#64748B" }}>{a.Alert_Time}</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontSize:11, color:"#E2E8F0" }}>{a.Channel}</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{a.Transaction_Type}</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontSize:11, color:"#E2E8F0", fontVariantNumeric:"tabular-nums", fontWeight:600 }}>{(Number(a.Amount__FCFA_||0)/1000000).toFixed(2)}M</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontFamily:"monospace", fontSize:10, color:"#64748B" }}>{a.Counterparty_Account}</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{a.Counterparty_Country}</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ fontWeight:700, fontVariantNumeric:"tabular-nums", color:Number(a.Fraud_Score)>=0.8?"#F87171":Number(a.Fraud_Score)>=0.6?"#F59E0B":"#34D399" }}>{Number(a.Fraud_Score||0).toFixed(2)}</span>
-                          </td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ padding:"2px 7px", borderRadius:6, fontSize:10, fontWeight:600, background:(BAND[a.Fraud_Band]||"#64748B")+"15", color:BAND[a.Fraud_Band]||"#64748B", border:"0.5px solid "+(BAND[a.Fraud_Band]||"#64748B")+"40" }}>{a.Fraud_Band}</span>
-                          </td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{a.Alert_Type}</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontSize:11, color:"#64748B" }}>{a.AML_Typology}</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ padding:"2px 7px", borderRadius:6, fontSize:10, fontWeight:600, background:(TIER2[a.AML_Risk_Tier]||"#64748B")+"15", color:TIER2[a.AML_Risk_Tier]||"#64748B", border:"0.5px solid "+(TIER2[a.AML_Risk_Tier]||"#64748B")+"40" }}>{a.AML_Risk_Tier}</span>
-                          </td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", textAlign:"center" }}><span style={{ color:a.SIM_Swap_Within_48h?"#F87171":"#334155", fontWeight:600 }}>{a.SIM_Swap_Within_48h?"Yes":"No"}</span></td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", textAlign:"center" }}><span style={{ color:a.New_Beneficiary?"#F59E0B":"#334155", fontWeight:600 }}>{a.New_Beneficiary?"Yes":"No"}</span></td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", textAlign:"center" }}><span style={{ color:a.Velocity_Flag__24h_?"#F59E0B":"#334155", fontWeight:600 }}>{a.Velocity_Flag__24h_?"Yes":"No"}</span></td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", textAlign:"center" }}><span style={{ color:a.Sanctions_Hit?"#F87171":"#334155", fontWeight:700 }}>{a.Sanctions_Hit?"HIT":"No"}</span></td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", textAlign:"center" }}><span style={{ color:a.PEP_Linked?"#F87171":"#334155", fontWeight:600 }}>{a.PEP_Linked?"Yes":"No"}</span></td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ fontSize:10, fontWeight:600, color:a.Case_Status==="SAR Filed"?"#34D399":a.Case_Status?.includes("FP")?"#475569":a.Case_Status==="Open"?"#F87171":"#F59E0B" }}>{a.Case_Status}</span>
-                          </td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", textAlign:"center" }}><span style={{ color:a.SAR_Required?"#F87171":"#334155", fontWeight:700 }}>{a.SAR_Required?"Yes":"No"}</span></td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontSize:11, color:"#64748B" }}>{a.SAR_Filed_Date||"--"}</td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ fontVariantNumeric:"tabular-nums", fontWeight:600, color:Number(a.MTTD__min_)<=10?"#34D399":Number(a.MTTD__min_)<=20?"#F59E0B":"#F87171" }}>{a.MTTD__min_} min</span>
-                          </td>
-                          <td style={{ padding:"8px 12px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{a.Investigator}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <div style={{ padding:"8px 14px", borderTop:"0.5px solid rgba(255,255,255,0.06)", fontSize:10, color:"#334155" }}>
-                  {alerts.length} alerts · All 27 columns · Scroll horizontally and vertically
-                </div>
-              </div>
-            </Section>
+            <DataViewer
+              sheetName="BP360_M3_Fraud_AML"
+              description="KPIs: fraud score, AML typology, SAR status, MTTD, sanctions flags"
+              accentColor="#FB923C"
+              rows={alerts}
+              columns={[
+                { key:"Alert_ID",            label:"Alert ID",       width:130, render:(v)=><span style={{fontFamily:"monospace",fontSize:10,color:"#60A5FA"}}>{v}</span> },
+                { key:"Account_ID",          label:"Account ID",     width:110, render:(v)=><span style={{fontFamily:"monospace",fontSize:10,color:"#64748B"}}>{v}</span> },
+                { key:"Customer_Name",       label:"Customer",       width:150, render:(v)=><span style={{color:"#E2E8F0",fontWeight:500}}>{v}</span> },
+                { key:"Region",              label:"Region",         width:120 },
+                { key:"City",                label:"City",           width:100 },
+                { key:"Alert_Date",          label:"Date",           width:100 },
+                { key:"Alert_Time",          label:"Time",           width:70  },
+                { key:"Channel",             label:"Channel",        width:90  },
+                { key:"Transaction_Type",    label:"Txn Type",       width:160 },
+                { key:"Amount__FCFA_",       label:"Amount (FCFA)",  width:120, render:(v)=><span style={{fontVariantNumeric:"tabular-nums",fontWeight:600,color:"#E2E8F0"}}>{(Number(v||0)/1000000).toFixed(2)}M</span> },
+                { key:"Counterparty_Account",label:"Counterparty",   width:130, render:(v)=><span style={{fontFamily:"monospace",fontSize:10,color:"#64748B"}}>{v}</span> },
+                { key:"Counterparty_Country",label:"Country",        width:100 },
+                { key:"Fraud_Score",         label:"Fraud Score",    width:100, render:(v)=><span style={{fontWeight:700,color:Number(v)>=0.8?"#F87171":Number(v)>=0.6?"#F59E0B":"#34D399"}}>{Number(v||0).toFixed(2)}</span> },
+                { key:"Fraud_Band",          label:"Band",           width:90,  render:(v)=>{ const c={"Low":"#34D399","Medium":"#F59E0B","High":"#FB923C","Critical":"#F87171"}[v as string]||"#64748B"; return <span style={{padding:"2px 7px",borderRadius:6,fontSize:10,fontWeight:600,background:c+"15",color:c,border:"0.5px solid "+c+"40"}}>{v}</span> } },
+                { key:"Alert_Type",          label:"Alert Type",     width:160 },
+                { key:"AML_Typology",        label:"AML Typology",   width:140 },
+                { key:"AML_Risk_Tier",       label:"Risk Tier",      width:90,  render:(v)=>{ const c={"Green":"#34D399","Amber":"#F59E0B","Red":"#F87171"}[v as string]||"#64748B"; return <span style={{padding:"2px 7px",borderRadius:6,fontSize:10,fontWeight:600,background:c+"15",color:c,border:"0.5px solid "+c+"40"}}>{v}</span> } },
+                { key:"SIM_Swap_Within_48h", label:"SIM Swap",       width:90,  render:(v)=><span style={{color:v?"#F87171":"#334155",fontWeight:600}}>{v?"Yes":"No"}</span> },
+                { key:"New_Beneficiary",     label:"New Benef.",      width:90,  render:(v)=><span style={{color:v?"#F59E0B":"#334155",fontWeight:600}}>{v?"Yes":"No"}</span> },
+                { key:"Velocity_Flag__24h_", label:"Velocity",       width:80,  render:(v)=><span style={{color:v?"#F59E0B":"#334155",fontWeight:600}}>{v?"Yes":"No"}</span> },
+                { key:"Sanctions_Hit",       label:"Sanctions",      width:90,  render:(v)=><span style={{color:v?"#F87171":"#334155",fontWeight:700}}>{v?"HIT":"No"}</span> },
+                { key:"PEP_Linked",          label:"PEP Linked",     width:90,  render:(v)=><span style={{color:v?"#F87171":"#334155",fontWeight:600}}>{v?"Yes":"No"}</span> },
+                { key:"Case_Status",         label:"Case Status",    width:120, render:(v)=><span style={{fontSize:10,fontWeight:600,color:v==="SAR Filed"?"#34D399":String(v).includes("FP")?"#475569":v==="Open"?"#F87171":"#F59E0B"}}>{v}</span> },
+                { key:"SAR_Required",        label:"SAR Req.",       width:90,  render:(v)=><span style={{color:v?"#F87171":"#334155",fontWeight:700}}>{v?"Yes":"No"}</span> },
+                { key:"SAR_Filed_Date",      label:"SAR Filed",      width:100, render:(v)=><span style={{color:"#64748B"}}>{v||"--"}</span> },
+                { key:"MTTD__min_",          label:"MTTD (min)",     width:90,  render:(v)=><span style={{fontWeight:600,color:Number(v)<=10?"#34D399":Number(v)<=20?"#F59E0B":"#F87171"}}>{v} min</span> },
+                { key:"Investigator",        label:"Investigator",   width:140 },
+              ]}
+            />
+          </Section>
           )}
         </>
       )}

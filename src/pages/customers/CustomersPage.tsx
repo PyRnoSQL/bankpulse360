@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { authHeader } from '@/lib/auth'
 import { Users, TrendingDown, AlertTriangle, Activity, Gift, Smartphone } from 'lucide-react'
 import { KPISkeletonGrid, TableSkeleton } from '@/components/ui/SkeletonCard'
+import { DataViewer } from '@/components/ui/DataViewer'
 
 function GreetingBar() {
   const user = (() => { try { const t = localStorage.getItem("bp360_token"); if (!t) return null; return JSON.parse(atob(t.split(".")[1])) } catch { return null } })()
@@ -172,37 +173,13 @@ export default function CustomersPage() {
           </Section>
 
           <Section title="High Churn Risk Accounts — Full Profile" color="#F87171">
-            <div style={{ background:"rgba(15,26,40,0.85)", border:"1px solid rgba(248,113,113,0.2)", borderRadius:14, overflow:"hidden" }}>
-              <div style={{ overflowX:"auto", overflowY:"auto", maxHeight:480 }}>
-                <table style={{ width:"100%", borderCollapse:"collapse", fontSize:11, minWidth: COLS.reduce((s,c)=>s+c.w,0) }}>
-                  <thead>
-                    <tr style={{ background:"rgba(15,26,40,0.98)" }}>
-                      {COLS.map(col => (
-                        <th key={col.key} style={{ padding:"10px 12px", textAlign:"left", fontSize:10, color:"#64748B", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", borderBottom:"1px solid rgba(255,255,255,0.1)", whiteSpace:"nowrap", minWidth:col.w, position:"sticky", top:0, background:"rgba(15,26,40,0.98)", zIndex:2 }}>
-                          {col.label}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {churn.map((row, i) => (
-                      <tr key={i} style={{ borderBottom:"0.5px solid rgba(255,255,255,0.04)", transition:"background 0.15s" }}
-                        onMouseEnter={e=>(e.currentTarget as HTMLTableRowElement).style.background="rgba(29,158,117,0.05)"}
-                        onMouseLeave={e=>(e.currentTarget as HTMLTableRowElement).style.background="transparent"}>
-                        {COLS.map(col => (
-                          <td key={col.key} style={{ padding:"9px 12px", whiteSpace:"nowrap", verticalAlign:"middle" }}>
-                            {renderCell(col, row)}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              <div style={{ padding:"8px 14px", borderTop:"0.5px solid rgba(255,255,255,0.06)", fontSize:10, color:"#334155" }}>
-                {churn.length} accounts · Scroll horizontally to see all columns · Click column headers to sort
-              </div>
-            </div>
+            <DataViewer
+              sheetName="BP360_M1_Customer360"
+              description="KPIs: churn probability, CLV, NPS, RFM, digital engagement"
+              accentColor="#F87171"
+              rows={churn}
+              columns={COLS.map(col => ({ key: col.key, label: col.label, width: col.w, render: (v, row) => renderCell(col, row) }))}
+            />
           </Section>
         </>
       )}
