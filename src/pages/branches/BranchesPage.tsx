@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { authHeader } from '@/lib/auth'
+import { KPISkeletonGrid, MapSkeleton, TableSkeleton } from '@/components/ui/SkeletonCard'
 import { MapPin, Activity, AlertTriangle, Users, Clock, TrendingUp } from 'lucide-react'
 
 function GreetingBar() {
@@ -216,10 +217,7 @@ export default function BranchesPage() {
     <div style={{ minHeight: "100%", background: "linear-gradient(160deg,#060F1A 0%,#0A1628 40%,#06120E 100%)", margin: -24, padding: "20px 24px 24px" }}>
       <GreetingBar />
       {loading && (
-        <div style={{ color: "#475569", fontSize: 13, padding: "40px 0", display: "flex", alignItems: "center", gap: 10 }}>
-          <span style={{ width: 16, height: 16, border: "2px solid #1D9E75", borderTopColor: "transparent", borderRadius: "50%", display: "inline-block", animation: "spin 0.8s linear infinite" }} />
-          Loading branch data from BigQuery...
-        </div>
+        <div><KPISkeletonGrid count={6} /><MapSkeleton /><TableSkeleton rows={5} /></div>
       )}
       {!loading && (
         <>

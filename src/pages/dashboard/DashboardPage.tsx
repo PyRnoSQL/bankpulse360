@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
+import { motion } from 'framer-motion'
 import { authHeader } from '@/lib/auth'
+import { KPISkeletonGrid } from '@/components/ui/SkeletonCard'
 import { TrendingUp, TrendingDown, Minus, AlertTriangle, Users, Building2, Shield, Activity } from 'lucide-react'
 
 interface Summary {
@@ -57,16 +59,20 @@ function KPICard({ icon, label, value, suffix, decimals, sub, accent, trend, tre
   const TrendIcon  = trend === 'up' ? TrendingUp : trend === 'down' ? TrendingDown : Minus
 
   return (
-    <div style={{
-      background: 'rgba(15,26,40,0.9)',
-      border: `1px solid ${alert && blink ? accent : accent + '30'}`,
-      borderRadius: 14,
-      padding: '18px 20px',
-      position: 'relative',
-      overflow: 'hidden',
-      transition: 'border-color 0.3s',
-      boxShadow: alert && blink ? `0 0 16px ${accent}40` : 'none',
-    }}>
+    <motion.div
+      whileHover={{ scale: 1.02, boxShadow: `0 0 24px ${accent}30` }}
+      transition={{ duration: 0.2 }}
+      style={{
+        background: 'rgba(15,26,40,0.9)',
+        border: `1px solid ${alert && blink ? accent : accent + '30'}`,
+        borderRadius: 14,
+        padding: '18px 20px',
+        position: 'relative',
+        overflow: 'hidden',
+        transition: 'border-color 0.3s',
+        boxShadow: alert && blink ? `0 0 16px ${accent}40` : 'none',
+        cursor: 'default',
+      }}>
       <div style={{ position: 'absolute', top: -30, right: -30, width: 90, height: 90, borderRadius: '50%', background: accent, opacity: 0.07, filter: 'blur(20px)', pointerEvents: 'none' }} />
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 14 }}>
@@ -100,7 +106,7 @@ function KPICard({ icon, label, value, suffix, decimals, sub, accent, trend, tre
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -170,13 +176,15 @@ export default function DashboardPage() {
       <GreetingBar />
 
       {loading && (
-        <div style={{ color: '#475569', fontSize: 13, padding: '40px 0', display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ width: 16, height: 16, border: '2px solid #1D9E75', borderTopColor: 'transparent', borderRadius: '50%', display: 'inline-block', animation: 'spin 0.8s linear infinite' }} />
-          Loading live data from BigQuery...
+        <div>
+          <KPISkeletonGrid count={4} />
+          <KPISkeletonGrid count={4} />
+          <KPISkeletonGrid count={4} />
         </div>
       )}
 
       {data && (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
         <>
           {/* Customer 360 */}
           <div style={{ marginBottom: 28 }}>
@@ -224,9 +232,9 @@ export default function DashboardPage() {
             </div>
             {echartsLoaded && <Sparkline data={[3.1,2.9,2.8,2.84,2.9,2.85,2.84]} color="#34D399" />}
           </div>
-        </>
+        </motion.div>
       )}
-      <style dangerouslySetInnerHTML={{ __html: "@keyframes spin{to{transform:rotate(360deg)}}" }} />
+      <style dangerouslySetInnerHTML={{ __html: `@keyframes spin{to{transform:rotate(360deg)}} @keyframes livePing{0%,100%{opacity:1;box-shadow:0 0 6px #34D399}50%{opacity:0.4;box-shadow:0 0 14px #34D399}}` }} />
     </div>
   )
 }

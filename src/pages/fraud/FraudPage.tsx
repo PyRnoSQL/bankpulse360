@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef } from 'react'
 import { authHeader } from '@/lib/auth'
+import { KPISkeletonGrid, NetworkSkeleton, TableSkeleton } from '@/components/ui/SkeletonCard'
 import { AlertTriangle, Shield, Zap, Clock, Smartphone, Ban } from 'lucide-react'
 
 function GreetingBar() {
