@@ -185,7 +185,6 @@ export default function DashboardPage() {
 
       {data && (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.5 }}>
-        <>
           {/* Customer 360 */}
           <div style={{ marginBottom: 28 }}>
             <SectionHeader icon={<Users size={14} />} label="Customer 360°" color="#818CF8" />

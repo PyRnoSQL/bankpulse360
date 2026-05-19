@@ -265,8 +265,7 @@ export default function BranchesPage() {
                 <button
                   onClick={() => {
                     const headers = ["Branch_ID","Branch_Name","Region","City","Branch_Tier","Date","Tellers_Scheduled","Tellers_Present","Customers_Served","Total_Txns","Manual_Txns","Digital_Txns","avg_service_time","p90_service_time","Max_Queue_Length","Avg_Wait_Time__min_","Queue_Abandonment","teller_utilisation","teller_error_rate","Rework_Count","sla_compliance","Loan_Apps_Received","Loan_Apps_Decided_Same_Day","loan_tat","Loan_Rework_Rate____","atm_uptime","Overtime_Hours","Absenteeism____","Sigma_Level","SPC_Flag","efficiency_score","digital_txn_pct","same_day_decision_rate","latitude","longitude"]
-                    const csv = [headers.join(","), ...branches.map(r => headers.map(h => { const v = (r as any)[h]; return String(v ?? "").includes(",") ? '"'+v+'"' : String(v ?? "") }).join(","))].join("
-")
+                    const csv = [headers.join(","), ...branches.map(r => headers.map(h => { const v = (r as any)[h]; return String(v ?? "").includes(",") ? '"'+v+'"' : String(v ?? "") }).join(","))].join("\n")
                     navigator.clipboard.writeText(csv)
                   }}
                   style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:6, padding:"5px 12px", borderRadius:8, background:"rgba(255,255,255,0.06)", border:"0.5px solid rgba(255,255,255,0.12)", color:"#94A3B8", cursor:"pointer", fontSize:11, fontWeight:500, fontFamily:"inherit" }}>
