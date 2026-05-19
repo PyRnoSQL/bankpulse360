@@ -318,82 +318,94 @@ export default function CreditPage() {
 
           {ews.length > 0 && (
             <Section title="Early Warning System — Click any loan to open XAI decision panel" color="#F87171">
-              <div style={{ background:"rgba(15,26,40,0.85)", border:"1px solid rgba(248,113,113,0.2)", borderRadius:14, overflow:"hidden" }}>
-                <div style={{ overflowX:"auto", overflowY:"auto", maxHeight:420 }}>
-                  <table style={{ width:"100%", borderCollapse:"collapse", fontSize:11, minWidth:1100 }}>
-                    <thead>
-                      <tr style={{ background:"rgba(15,26,40,0.98)" }}>
-                        {[
-                          {label:"Loan ID",       w:120},
-                          {label:"Client",        w:150},
-                          {label:"Region",        w:120},
-                          {label:"City",          w:100},
-                          {label:"Sector",        w:110},
-                          {label:"Loan Type",     w:110},
-                          {label:"Outstanding",   w:120},
-                          {label:"DPD",           w:70},
-                          {label:"PD %",          w:70},
-                          {label:"Stage",         w:70},
-                          {label:"Coverage %",    w:100},
-                          {label:"Classification",w:120},
-                          {label:"EWS Flag",      w:90},
-                          {label:"Rel. Manager",  w:140},
-                          {label:"Branch",        w:140},
-                        ].map(h => (
-                          <th key={h.label} style={{ padding:"10px 12px", textAlign:"left", fontSize:10, color:"#64748B", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase", borderBottom:"1px solid rgba(255,255,255,0.1)", whiteSpace:"nowrap", minWidth:h.w, position:"sticky", top:0, background:"rgba(15,26,40,0.98)", zIndex:2 }}>
-                            {h.label}
-                          </th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {ews.map((r: any, i: number) => (
-                        <tr key={i} onClick={() => setSelected(r)} style={{ borderBottom:"0.5px solid rgba(255,255,255,0.04)", cursor:"pointer", transition:"background 0.15s" }}
+            <div style={{ background:"rgba(15,26,40,0.92)", border:"1px solid rgba(248,113,113,0.22)", borderRadius:14, overflow:"hidden" }}>
+              <div style={{ padding:"10px 16px", background:"rgba(10,18,32,0.99)", borderBottom:"0.5px solid rgba(255,255,255,0.07)", display:"flex", alignItems:"center", gap:12, flexWrap:"wrap" }}>
+                <span style={{ fontSize:12, color:"#94A3B8" }}>Sheet: <strong style={{ color:"#F1F5F9" }}>BP360_M2_CreditRisk_NPL</strong></span>
+                <span style={{ color:"#334155" }}>·</span>
+                <span style={{ fontSize:12, color:"#64748B" }}>{ews.length} rows · 31 columns</span>
+                <span style={{ color:"#334155" }}>·</span>
+                <span style={{ fontSize:12, color:"#64748B" }}>KPIs: PD score, DPD, IFRS9 stage, ECL, coverage ratio, EWS flags</span>
+                <button onClick={() => {
+                  const keys = ["Loan_ID","Client_Name","Region","City","Sector","Loan_Type","Disbursement_Date","Maturity_Date","Tenor__months_","Principal__FCFA_","Outstanding_Bal__FCFA_","Monthly_Install__FCFA_","Payments_Made","Payments_Missed","Days_Past_Due","PD_Score____","LGD____","EAD__FCFA_","Collateral_Value__FCFA_","Coverage_Ratio____","IFRS9_Stage","Loan_Classification","ECL_Provision__FCFA_","EWS_Flag","Relationship_Manager","Branch","Vintage_Year","outstanding_millions","ecl_millions","dpd_bucket","pd_band"]
+                  const rows = [keys.join(","), ...ews.map((r:any) => keys.map(k => { const v = String(r[k] ?? ""); return v.includes(",") ? '"'+v+'"' : v }).join(","))]
+                  navigator.clipboard.writeText(rows.join("\n"))
+                }} style={{ marginLeft:"auto", display:"flex", alignItems:"center", gap:6, padding:"5px 12px", borderRadius:8, background:"rgba(255,255,255,0.06)", border:"0.5px solid rgba(255,255,255,0.12)", color:"#94A3B8", cursor:"pointer", fontSize:11, fontWeight:500, fontFamily:"inherit" }}>
+                  ⎘ Copy CSV
+                </button>
+              </div>
+              <div style={{ overflowX:"auto", overflowY:"auto", maxHeight:460 }}>
+                <table style={{ width:"100%", borderCollapse:"collapse", fontSize:12, minWidth:3600 }}>
+                  <thead>
+                    <tr>
+                      {([
+                        {l:"LOAN ID",w:130},{l:"CLIENT",w:150},{l:"REGION",w:130},{l:"CITY",w:110},
+                        {l:"SECTOR",w:120},{l:"LOAN TYPE",w:120},{l:"DISBURSEMENT",w:130},{l:"MATURITY",w:120},
+                        {l:"TENOR (MO)",w:110},{l:"PRINCIPAL (FCFA)",w:150},{l:"OUTSTANDING",w:130},
+                        {l:"MONTHLY INSTALL",w:150},{l:"PAYMENTS MADE",w:140},{l:"PAYMENTS MISSED",w:150},
+                        {l:"DPD",w:80},{l:"PD %",w:80},{l:"LGD %",w:80},{l:"EAD (FCFA)",w:120},
+                        {l:"COLLATERAL",w:120},{l:"COVERAGE %",w:110},{l:"STAGE",w:80},
+                        {l:"CLASSIFICATION",w:140},{l:"ECL PROVISION",w:130},{l:"EWS FLAG",w:100},
+                        {l:"REL. MANAGER",w:150},{l:"BRANCH",w:150},{l:"VINTAGE",w:90},
+                        {l:"OUTSTANDING (M)",w:150},{l:"ECL (M)",w:100},{l:"DPD BUCKET",w:120},{l:"PD BAND",w:120},
+                      ] as {l:string;w:number}[]).map(h => (
+                        <th key={h.l} style={{ padding:"11px 14px", textAlign:"left", fontSize:10, fontWeight:700, color:"#64748B", letterSpacing:"0.08em", borderBottom:"1px solid rgba(255,255,255,0.1)", whiteSpace:"nowrap", minWidth:h.w, position:"sticky", top:0, background:"rgba(10,18,32,0.99)", zIndex:2 }}>{h.l}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {ews.map((r:any, i:number) => {
+                      const ewsColor:Record<string,string> = {None:"#34D399",Low:"#60A5FA",Medium:"#F59E0B",High:"#FB923C",Critical:"#F87171"}
+                      const clfColor:Record<string,string> = {Pass:"#34D399",Watch:"#60A5FA",Substandard:"#F59E0B",Doubtful:"#FB923C",Loss:"#F87171"}
+                      const ec = ewsColor[r.EWS_Flag]||"#64748B"
+                      const cc = clfColor[r.Loan_Classification]||"#64748B"
+                      return (
+                        <tr key={i} onClick={() => setSelected(r)}
+                          style={{ borderBottom:"0.5px solid rgba(255,255,255,0.04)", cursor:"pointer", transition:"background 0.12s" }}
                           onMouseEnter={e=>(e.currentTarget as HTMLTableRowElement).style.background="rgba(29,158,117,0.06)"}
                           onMouseLeave={e=>(e.currentTarget as HTMLTableRowElement).style.background="transparent"}>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ fontSize:11, color:"#60A5FA", fontFamily:"monospace" }}>{r.Loan_ID}</span>
-                          </td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
-                            <div style={{ fontSize:12, color:"#34D399", fontWeight:600 }}>{r.Client_Name}</div>
-                          </td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{r.Region}</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#64748B" }}>{r.City}</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#E2E8F0" }}>{r.Sector}</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{r.Loan_Type}</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#E2E8F0", fontVariantNumeric:"tabular-nums" }}>
-                            {(Number(r.Outstanding_Bal__FCFA_||0)/1000000).toFixed(1)}M
-                          </td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ fontWeight:700, color:Number(r.Days_Past_Due)>60?"#F87171":Number(r.Days_Past_Due)>30?"#F59E0B":"#94A3B8", fontVariantNumeric:"tabular-nums" }}>{r.Days_Past_Due}d</span>
-                          </td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ fontWeight:700, color:Number(r.PD_Score____)>30?"#F87171":Number(r.PD_Score____)>15?"#F59E0B":"#34D399", fontVariantNumeric:"tabular-nums" }}>{r.PD_Score____}%</span>
-                          </td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ padding:"2px 7px", borderRadius:6, fontSize:10, fontWeight:700, background:r.IFRS9_Stage==="3"?"rgba(248,113,113,0.15)":r.IFRS9_Stage==="2"?"rgba(245,158,11,0.15)":"rgba(52,211,153,0.12)", color:r.IFRS9_Stage==="3"?"#F87171":r.IFRS9_Stage==="2"?"#F59E0B":"#34D399" }}>S{r.IFRS9_Stage}</span>
-                          </td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ fontWeight:600, color:Number(r.Coverage_Ratio____)>=80?"#34D399":Number(r.Coverage_Ratio____)>=60?"#F59E0B":"#F87171", fontVariantNumeric:"tabular-nums" }}>{r.Coverage_Ratio____}%</span>
-                          </td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ padding:"2px 8px", borderRadius:6, fontSize:10, fontWeight:600, background:r.Loan_Classification==="Loss"?"rgba(248,113,113,0.15)":r.Loan_Classification==="Doubtful"?"rgba(251,146,60,0.15)":r.Loan_Classification==="Substandard"?"rgba(245,158,11,0.15)":"rgba(52,211,153,0.12)", color:r.Loan_Classification==="Loss"?"#F87171":r.Loan_Classification==="Doubtful"?"#FB923C":r.Loan_Classification==="Substandard"?"#F59E0B":"#34D399" }}>{r.Loan_Classification}</span>
-                          </td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap" }}>
-                            <span style={{ padding:"2px 8px", borderRadius:6, fontSize:10, fontWeight:600, background:(EWS_COLOR[r.EWS_Flag]||"#64748B")+"15", color:EWS_COLOR[r.EWS_Flag]||"#64748B", border:"0.5px solid "+(EWS_COLOR[r.EWS_Flag]||"#64748B")+"40" }}>{r.EWS_Flag}</span>
-                          </td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{r.Relationship_Manager}</td>
-                          <td style={{ padding:"9px 12px", whiteSpace:"nowrap", fontSize:11, color:"#64748B" }}>{r.Branch}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontFamily:"monospace", fontSize:10, color:"#60A5FA" }}>{r.Loan_ID}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:12, color:"#34D399", fontWeight:600 }}>{r.Client_Name}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{r.Region}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#64748B" }}>{r.City}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#E2E8F0" }}>{r.Sector}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{r.Loan_Type}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#64748B" }}>{r.Disbursement_Date}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#64748B" }}>{r.Maturity_Date}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8", textAlign:"right", fontVariantNumeric:"tabular-nums" }}>{r.Tenor__months_}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#E2E8F0", textAlign:"right", fontVariantNumeric:"tabular-nums" }}>{Number(r.Principal__FCFA_||0).toLocaleString()}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#E2E8F0", fontWeight:600, textAlign:"right", fontVariantNumeric:"tabular-nums" }}>{Number(r.Outstanding_Bal__FCFA_||0).toLocaleString()}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8", textAlign:"right", fontVariantNumeric:"tabular-nums" }}>{Number(r.Monthly_Install__FCFA_||0).toLocaleString()}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#34D399", textAlign:"right", fontVariantNumeric:"tabular-nums" }}>{r.Payments_Made}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", textAlign:"right" }}><span style={{ fontWeight:600, color:Number(r.Payments_Missed)>0?"#F87171":"#34D399", fontVariantNumeric:"tabular-nums" }}>{r.Payments_Missed}</span></td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", textAlign:"right" }}><span style={{ fontWeight:700, color:Number(r.Days_Past_Due)>60?"#F87171":Number(r.Days_Past_Due)>30?"#F59E0B":"#94A3B8", fontVariantNumeric:"tabular-nums" }}>{r.Days_Past_Due}d</span></td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", textAlign:"right" }}><span style={{ fontWeight:700, color:Number(r.PD_Score____)>30?"#F87171":Number(r.PD_Score____)>15?"#F59E0B":"#34D399", fontVariantNumeric:"tabular-nums" }}>{r.PD_Score____}%</span></td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8", textAlign:"right" }}>{r.LGD____}%</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#64748B", textAlign:"right", fontVariantNumeric:"tabular-nums" }}>{Number(r.EAD__FCFA_||0).toLocaleString()}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#64748B", textAlign:"right", fontVariantNumeric:"tabular-nums" }}>{Number(r.Collateral_Value__FCFA_||0).toLocaleString()}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", textAlign:"right" }}><span style={{ fontWeight:600, color:Number(r.Coverage_Ratio____)>=80?"#34D399":Number(r.Coverage_Ratio____)>=60?"#F59E0B":"#F87171", fontVariantNumeric:"tabular-nums" }}>{r.Coverage_Ratio____}%</span></td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", textAlign:"center" }}><span style={{ padding:"2px 7px", borderRadius:6, fontSize:10, fontWeight:700, background:r.IFRS9_Stage==="3"?"rgba(248,113,113,0.15)":r.IFRS9_Stage==="2"?"rgba(245,158,11,0.15)":"rgba(52,211,153,0.12)", color:r.IFRS9_Stage==="3"?"#F87171":r.IFRS9_Stage==="2"?"#F59E0B":"#34D399" }}>S{r.IFRS9_Stage}</span></td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap" }}><span style={{ padding:"2px 8px", borderRadius:6, fontSize:10, fontWeight:600, background:cc+"15", color:cc }}>{r.Loan_Classification}</span></td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8", textAlign:"right", fontVariantNumeric:"tabular-nums" }}>{Number(r.ECL_Provision__FCFA_||0).toLocaleString()}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap" }}><span style={{ padding:"2px 8px", borderRadius:6, fontSize:10, fontWeight:600, background:ec+"15", color:ec, border:"0.5px solid "+ec+"40" }}>{r.EWS_Flag}</span></td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#94A3B8" }}>{r.Relationship_Manager}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#64748B" }}>{r.Branch}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#475569", textAlign:"right" }}>{r.Vintage_Year}</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#60A5FA", fontWeight:600, textAlign:"right", fontVariantNumeric:"tabular-nums" }}>{r.outstanding_millions}M</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap", fontSize:11, color:"#F59E0B", fontWeight:600, textAlign:"right", fontVariantNumeric:"tabular-nums" }}>{r.ecl_millions}M</td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap" }}><span style={{ padding:"2px 7px", borderRadius:6, fontSize:10, fontWeight:600, background:"rgba(100,116,139,0.15)", color:"#94A3B8" }}>{r.dpd_bucket}</span></td>
+                          <td style={{ padding:"9px 14px", whiteSpace:"nowrap" }}><span style={{ padding:"2px 8px", borderRadius:6, fontSize:10, fontWeight:600, background:r.pd_band==="High Risk"?"rgba(248,113,113,0.15)":r.pd_band==="Medium Risk"?"rgba(245,158,11,0.15)":"rgba(52,211,153,0.12)", color:r.pd_band==="High Risk"?"#F87171":r.pd_band==="Medium Risk"?"#F59E0B":"#34D399" }}>{r.pd_band}</span></td>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                <div style={{ padding:"8px 14px", borderTop:"0.5px solid rgba(255,255,255,0.06)", fontSize:10, color:"#334155" }}>
-                  {ews.length} alerts · Scroll to see all columns · Click any row to open XAI decision panel
-                </div>
+                      )
+                    })}
+                  </tbody>
+                </table>
               </div>
-            </Section>
+              <div style={{ padding:"7px 16px", background:"rgba(10,18,32,0.99)", borderTop:"0.5px solid rgba(255,255,255,0.05)", display:"flex", justifyContent:"space-between" }}>
+                <span style={{ fontSize:10, color:"#334155" }}>Click any row to open XAI panel · Scroll horizontally for all 31 columns · Color = risk threshold</span>
+                <span style={{ fontSize:10, color:"#1e3a5f" }}>BankPulse 360° · BigQuery Live</span>
+              </div>
+            </div>
+          </Section>
           )}
         </>
       )}
