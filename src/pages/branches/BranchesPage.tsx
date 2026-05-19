@@ -276,7 +276,7 @@ export default function BranchesPage() {
 
               {/* Scrollable table */}
               <div style={{ overflowX:"auto", overflowY:"auto", maxHeight:480 }}>
-                <table style={{ width:"100%", borderCollapse:"collapse", fontSize:12 }}>
+                <table style={{ width:"100%", borderCollapse:"collapse", fontSize:12, minWidth:3800 }}>
                   <thead>
                     <tr>
                       {([
