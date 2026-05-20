@@ -3,6 +3,7 @@ import { authHeader } from '@/lib/auth'
 import { DataViewer } from '@/components/ui/DataViewer'
 import { KPISkeletonGrid, MapSkeleton, TableSkeleton } from '@/components/ui/SkeletonCard'
 import { MapPin, Activity, AlertTriangle, Users, Clock, TrendingUp } from 'lucide-react'
+import { KPICard } from '@/components/ui/KPICard'
 
 function GreetingBar() {
   const user = (() => { try { const t = localStorage.getItem("bp360_token"); if (!t) return null; return JSON.parse(atob(t.split(".")[1])) } catch { return null } })()
@@ -223,25 +224,13 @@ export default function BranchesPage() {
       {!loading && (
         <>
           <Section title="Network Summary" color="#34D399">
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12 }}>
-              {[
-                { icon: <MapPin size={15}/>,         label: "Total Branches",     value: String(branches.length || "--"), sub: "across all regions",   accent: "#60A5FA" },
-                { icon: <Activity size={15}/>,       label: "Avg Sigma Level",    value: avgSigma + "σ",                  sub: "DMAIC process quality", accent: "#34D399" },
-                { icon: <TrendingUp size={15}/>,     label: "Avg SLA Compliance", value: avgSla + "%",                    sub: "service level target",  accent: "#60A5FA" },
-                { icon: <Clock size={15}/>,          label: "Avg Service Time",   value: avgSvc + " min",                 sub: "per transaction",       accent: "#F59E0B" },
-                { icon: <AlertTriangle size={15}/>,  label: "Out-of-Control",     value: String(ooc),                     sub: "need intervention",     accent: "#F87171" },
-                { icon: <Users size={15}/>,          label: "Customers Served",   value: String(totalCust),               sub: "total today",           accent: "#818CF8" },
-              ].map(k => (
-                <div key={k.label} style={{ background: "rgba(15,26,40,0.85)", border: "1px solid " + k.accent + "28", borderRadius: 14, padding: "16px 18px", position: "relative", overflow: "hidden" }}>
-                  <div style={{ position: "absolute", top: -30, right: -30, width: 80, height: 80, borderRadius: "50%", background: k.accent, opacity: 0.07, filter: "blur(20px)" }} />
-                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-                    <span style={{ fontSize: 10, color: "#94A3B8", fontWeight: 600, letterSpacing: "0.06em", textTransform: "uppercase" }}>{k.label}</span>
-                    <span style={{ color: k.accent, opacity: 0.8 }}>{k.icon}</span>
-                  </div>
-                  <div style={{ fontSize: 26, fontWeight: 700, color: "#F1F5F9", letterSpacing: "-0.02em", marginBottom: 4 }}>{k.value}</div>
-                  <div style={{ fontSize: 11, color: "#64748B" }}>{k.sub}</div>
-                </div>
-              ))}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(175px,1fr))", gap:12 }}>
+              <KPICard icon={<MapPin size={14}/>}        label="Total Branches"     value={branches.length}        suffix=""     decimals={0} sub="across all regions"    accent="#60A5FA" trend="neutral" />
+              <KPICard icon={<Activity size={14}/>}      label="Avg Sigma Level"    value={parseFloat(avgSigma)}   suffix="σ"    decimals={2} sub="DMAIC process quality"  accent="#34D399" trend="up" trendVal="target: 4.0" sigma={parseFloat(avgSigma)} />
+              <KPICard icon={<TrendingUp size={14}/>}    label="Avg SLA Compliance" value={parseFloat(avgSla)}     suffix="%"    decimals={1} sub="service level target"   accent="#60A5FA" trend="neutral" trendVal="target: 90%" />
+              <KPICard icon={<Clock size={14}/>}         label="Avg Service Time"   value={parseFloat(avgSvc)}     suffix=" min" decimals={1} sub="per transaction"        accent="#F59E0B" trend="neutral" />
+              <KPICard icon={<AlertTriangle size={14}/>} label="Out-of-Control"     value={ooc}                    suffix=""     decimals={0} sub="need intervention"      accent="#F87171" trend="down" trendVal="SPC flagged" alert={ooc > 3} />
+              <KPICard icon={<Users size={14}/>}         label="Customers Served"   value={totalCust}              suffix=""     decimals={0} sub="total today"            accent="#818CF8" trend="neutral" />
             </div>
           </Section>
 

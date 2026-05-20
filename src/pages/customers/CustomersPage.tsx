@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { authHeader } from '@/lib/auth'
 import { Users, TrendingDown, AlertTriangle, Activity, Gift, Smartphone } from 'lucide-react'
+import { KPICard } from '@/components/ui/KPICard'
 import { KPISkeletonGrid, TableSkeleton } from '@/components/ui/SkeletonCard'
 import { DataViewer } from '@/components/ui/DataViewer'
 
@@ -154,25 +155,13 @@ export default function CustomersPage() {
       {!loading && (
         <>
           <Section title="High Churn Risk — Summary" color="#F87171">
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(145px,1fr))", gap: 12 }}>
-              {[
-                { icon:<AlertTriangle size={14}/>, label:"At-Risk Accounts",   value:String(totalChurn),     sub:"churn prob >= 50%",    accent:"#F87171" },
-                { icon:<Activity size={14}/>,      label:"Avg Churn Prob",     value:avgChurn+"%",           sub:"portfolio average",    accent:"#F59E0B" },
-                { icon:<Users size={14}/>,         label:"Dormant Accounts",   value:String(dormant),        sub:"no recent activity",   accent:"#475569" },
-                { icon:<Smartphone size={14}/>,    label:"No Mobile Banking",  value:String(noMobile),       sub:"digital gap",          accent:"#60A5FA" },
-                { icon:<TrendingDown size={14}/>,  label:"High CLV at Risk",   value:String(highCLV),        sub:"CLV > 5M FCFA",        accent:"#818CF8" },
-                { icon:<Gift size={14}/>,          label:"Offers Pending",     value:String(offerPend),      sub:"sent but not accepted",accent:"#34D399" },
-              ].map(k => (
-                <div key={k.label} style={{ background:"rgba(15,26,40,0.85)", border:"1px solid "+k.accent+"28", borderRadius:14, padding:"14px 16px", position:"relative", overflow:"hidden" }}>
-                  <div style={{ position:"absolute", top:-24, right:-24, width:70, height:70, borderRadius:"50%", background:k.accent, opacity:0.07, filter:"blur(16px)" }} />
-                  <div style={{ display:"flex", justifyContent:"space-between", marginBottom:8 }}>
-                    <span style={{ fontSize:10, color:"#94A3B8", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase" }}>{k.label}</span>
-                    <span style={{ color:k.accent, opacity:0.8 }}>{k.icon}</span>
-                  </div>
-                  <div style={{ fontSize:24, fontWeight:700, color:"#F1F5F9", marginBottom:3 }}>{k.value}</div>
-                  <div style={{ fontSize:11, color:"#64748B" }}>{k.sub}</div>
-                </div>
-              ))}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(175px,1fr))", gap:12 }}>
+              <KPICard icon={<AlertTriangle size={14}/>} label="At-Risk Accounts"  value={totalChurn}         suffix=""  decimals={0} sub="churn prob >= 50%"     accent="#F87171" trend="down" trendVal="action needed" alert={totalChurn > 3} />
+              <KPICard icon={<Activity size={14}/>}      label="Avg Churn Prob"    value={parseFloat(avgChurn)} suffix="%" decimals={1} sub="portfolio average"     accent="#F59E0B" trend="down" trendVal="high risk" />
+              <KPICard icon={<Users size={14}/>}         label="Dormant Accounts"  value={dormant}            suffix=""  decimals={0} sub="no recent activity"    accent="#475569" trend="neutral" />
+              <KPICard icon={<Smartphone size={14}/>}    label="No Mobile Banking" value={noMobile}           suffix=""  decimals={0} sub="digital gap"            accent="#60A5FA" trend="neutral" />
+              <KPICard icon={<TrendingDown size={14}/>}  label="High CLV at Risk"  value={highCLV}            suffix=""  decimals={0} sub="CLV > 5M FCFA"          accent="#818CF8" trend="down" trendVal="revenue risk" />
+              <KPICard icon={<Gift size={14}/>}          label="Offers Pending"    value={offerPend}          suffix=""  decimals={0} sub="sent but not accepted"  accent="#34D399" trend="neutral" />
             </div>
           </Section>
 

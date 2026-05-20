@@ -3,6 +3,7 @@ import { authHeader } from '@/lib/auth'
 import { DataViewer } from '@/components/ui/DataViewer'
 import { KPISkeletonGrid, NetworkSkeleton, TableSkeleton } from '@/components/ui/SkeletonCard'
 import { AlertTriangle, Shield, Zap, Clock, Smartphone, Ban } from 'lucide-react'
+import { KPICard } from '@/components/ui/KPICard'
 
 function GreetingBar() {
   const user = (() => { try { const t = localStorage.getItem("bp360_token"); if (!t) return null; return JSON.parse(atob(t.split(".")[1])) } catch { return null } })()
@@ -291,25 +292,13 @@ export default function FraudPage() {
       {!loading && (
         <>
           <Section title="Alert Summary" color="#F87171">
-            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(145px,1fr))", gap:12 }}>
-              {[
-                { icon:<AlertTriangle size={14}/>, label:"Critical Alerts",  value:String(critical),    sub:"immediate action",    accent:"#F87171" },
-                { icon:<Shield size={14}/>,        label:"SAR Required",     value:String(sarNeeded),   sub:"pending reports",     accent:"#FB923C" },
-                { icon:<Ban size={14}/>,           label:"Red Risk Tier",    value:String(redTier),     sub:"high-risk accounts",  accent:"#F87171" },
-                { icon:<Clock size={14}/>,         label:"Avg MTTD",         value:avgMttd+" min",      sub:"mean time to detect", accent:"#34D399" },
-                { icon:<Smartphone size={14}/>,    label:"SIM Swap Alerts",  value:String(simSwap),     sub:"within 48h",          accent:"#F59E0B" },
-                { icon:<Zap size={14}/>,           label:"Sanctions Hits",   value:String(sanctions),   sub:"watchlist matches",   accent:"#F87171" },
-              ].map(k => (
-                <div key={k.label} style={{ background:"rgba(15,26,40,0.85)", border:"1px solid "+k.accent+"28", borderRadius:14, padding:"16px 18px", position:"relative", overflow:"hidden" }}>
-                  <div style={{ position:"absolute", top:-30, right:-30, width:80, height:80, borderRadius:"50%", background:k.accent, opacity:0.07, filter:"blur(20px)" }} />
-                  <div style={{ display:"flex", justifyContent:"space-between", marginBottom:10 }}>
-                    <span style={{ fontSize:10, color:"#94A3B8", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase" }}>{k.label}</span>
-                    <span style={{ color:k.accent, opacity:0.8 }}>{k.icon}</span>
-                  </div>
-                  <div style={{ fontSize:26, fontWeight:700, color:"#F1F5F9", letterSpacing:"-0.02em", marginBottom:4 }}>{k.value}</div>
-                  <div style={{ fontSize:11, color:"#64748B" }}>{k.sub}</div>
-                </div>
-              ))}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(175px,1fr))", gap:12 }}>
+              <KPICard icon={<AlertTriangle size={14}/>} label="Critical Alerts"  value={critical}   suffix=""     decimals={0} sub="immediate action"    accent="#F87171" trend="down" trendVal="this week"  alert={critical > 0} />
+              <KPICard icon={<Shield size={14}/>}        label="SAR Required"     value={sarNeeded}  suffix=""     decimals={0} sub="pending reports"     accent="#FB923C" trend="neutral" trendVal="pending" />
+              <KPICard icon={<Ban size={14}/>}           label="Red Risk Tier"    value={redTier}    suffix=""     decimals={0} sub="high-risk accounts"  accent="#F87171" trend="down" alert={redTier > 2} />
+              <KPICard icon={<Clock size={14}/>}         label="Avg MTTD"         value={avgMttd}    suffix=" min" decimals={0} sub="mean time to detect" accent="#34D399" trend="neutral" trendVal="target <15" />
+              <KPICard icon={<Smartphone size={14}/>}    label="SIM Swap Alerts"  value={simSwap}    suffix=""     decimals={0} sub="within 48h"          accent="#F59E0B" trend="neutral" />
+              <KPICard icon={<Zap size={14}/>}           label="Sanctions Hits"   value={sanctions}  suffix=""     decimals={0} sub="watchlist matches"   accent="#F87171" trend="down" alert={sanctions > 0} />
             </div>
           </Section>
 

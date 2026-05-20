@@ -3,6 +3,7 @@ import { authHeader } from '@/lib/auth'
 import { DataViewer } from '@/components/ui/DataViewer'
 import { KPISkeletonGrid, TableSkeleton } from '@/components/ui/SkeletonCard'
 import { AlertTriangle, TrendingDown, TrendingUp, Shield, DollarSign, Activity, ChevronRight } from 'lucide-react'
+import { KPICard } from '@/components/ui/KPICard'
 
 function GreetingBar() {
   const user = (() => { try { const t = localStorage.getItem("bp360_token"); if (!t) return null; return JSON.parse(atob(t.split(".")[1])) } catch { return null } })()
