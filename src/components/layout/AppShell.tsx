@@ -17,15 +17,16 @@ const PAGE_META: Record<string, { title: string; subtitle: string }> = {
 }
 
 const NAV = [
-  { to: '/dashboard', label: '📊', full: 'Overview'      },
-  { to: '/customers', label: '👥', full: 'Customer 360°' },
-  { to: '/credit',    label: '📈', full: 'Credit & NPL'  },
-    { to: '/loans',     label: '📝', full: '↳ Loan Form'    },
-  { to: '/fraud',     label: '🛡', full: 'Fraud & AML'   },
-  { to: '/branches',  label: '🏦', full: 'Branch Ops'    },
-    { to: '/loans',     label: '📝', full: 'Loan Form'      },
-    { to: '/insurance', label: '🛡', full: 'Insurance'      },
-    { to: '/reporting', label: '📋', full: 'Reports'        },
+const NAV = [
+  { to: '/dashboard', label: '📊', full: 'Overview'       },
+  { to: '/customers', label: '👥', full: 'Customer 360°'  },
+  { to: '/credit',    label: '📈', full: 'Credit & NPL',  children: [
+    { to: '/loans',   label: '📝', full: 'Loan Origination' },
+  ]},
+  { to: '/fraud',     label: '🛡', full: 'Fraud & AML'    },
+  { to: '/branches',  label: '🏦', full: 'Branch Ops'     },
+  { to: '/insurance', label: '🛡', full: 'Insurance'       },
+  { to: '/reporting', label: '📋', full: 'Reports'         },
 ]
 
 /* ── Date string (static per second) ────────────────────── */
@@ -63,6 +64,7 @@ export default function AppShell() {
   const user       = getUser()
   const page = PAGE_META[location.pathname] || PAGE_META['/dashboard']
   const [collapsed, setCollapsed] = useState(false)
+  const [creditOpen, setCreditOpen] = useState(false)
   const [lang,      setLang]      = useState<'EN'|'FR'>('EN')
 
   const initials = (user?.name || 'AM').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()
@@ -139,24 +141,65 @@ export default function AppShell() {
 
         {/* Nav links */}
         <nav style={{ flex: 1, padding: collapsed ? '12px 8px' : '12px 10px', transition: TRANSITION }}>
-          {NAV.map(({ to, label, full }) => (
-            <NavLink key={to} to={to} title={full} style={({ isActive }) => ({
-              display: 'flex', alignItems: 'center',
-              gap: collapsed ? 0 : 10,
-              justifyContent: collapsed ? 'center' : 'flex-start',
-              padding: collapsed ? '10px 0' : '9px 12px',
-              borderRadius: 8, marginBottom: 3,
-              fontSize: collapsed ? 18 : 13,
-              color: isActive ? '#fff' : 'rgba(255,255,255,0.5)',
-              background: isActive ? 'rgba(29,158,117,0.18)' : 'transparent',
-              borderLeft: isActive ? '2px solid #1D9E75' : '2px solid transparent',
-              transition: 'all 0.15s',
-              textDecoration: 'none',
-            })}>
-              <span style={{ flexShrink: 0 }}>{label}</span>
-              {!collapsed && <span style={{ fontSize: 13 }}>{full}</span>}
-            </NavLink>
-          ))}
+          {NAV.map((item: any) => {
+            const hasChildren = item.children && item.children.length > 0
+            const isCredit    = item.to === '/credit'
+
+            return (
+              <div key={item.to}>
+                <div style={{ display:'flex', alignItems:'center' }}>
+                  <NavLink
+                    to={item.to}
+                    title={item.full}
+                    onClick={() => { if (hasChildren) setCreditOpen(o => !o) }}
+                    style={({ isActive }) => ({
+                      flex: 1,
+                      display: 'flex', alignItems: 'center',
+                      gap: collapsed ? 0 : 10,
+                      justifyContent: collapsed ? 'center' : 'flex-start',
+                      padding: collapsed ? '10px 0' : '9px 12px',
+                      borderRadius: 9,
+                      textDecoration: 'none',
+                      fontSize: collapsed ? 18 : 13,
+                      fontWeight: isActive ? 600 : 400,
+                      color: isActive ? '#34D399' : '#64748B',
+                      background: isActive ? 'rgba(29,158,117,0.1)' : 'transparent',
+                      transition: 'all 0.15s',
+                    })}>
+                    <span>{item.label}</span>
+                    {!collapsed && <span style={{ fontSize: 13 }}>{item.full}</span>}
+                    {!collapsed && hasChildren && (
+                      <span style={{ marginLeft:'auto', fontSize:10, color:'#475569', transition:'transform 0.2s', transform: creditOpen?'rotate(90deg)':'rotate(0deg)' }}>›</span>
+                    )}
+                  </NavLink>
+                </div>
+                {hasChildren && !collapsed && creditOpen && (
+                  <div style={{ marginLeft:16, borderLeft:'1px solid rgba(29,158,117,0.2)', paddingLeft:8, marginBottom:2 }}>
+                    {item.children.map((child: any) => (
+                      <NavLink
+                        key={child.to}
+                        to={child.to}
+                        title={child.full}
+                        style={({ isActive }) => ({
+                          display: 'flex', alignItems: 'center', gap: 8,
+                          padding: '7px 10px',
+                          borderRadius: 8,
+                          textDecoration: 'none',
+                          fontSize: 12,
+                          fontWeight: isActive ? 600 : 400,
+                          color: isActive ? '#34D399' : '#475569',
+                          background: isActive ? 'rgba(29,158,117,0.08)' : 'transparent',
+                          transition: 'all 0.15s',
+                        })}>
+                        <span style={{ fontSize:14 }}>{child.label}</span>
+                        <span>{child.full}</span>
+                      </NavLink>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })}
         </nav>
 
         {/* ── User footer block ── */}
