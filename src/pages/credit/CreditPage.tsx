@@ -278,25 +278,13 @@ export default function CreditPage() {
           {sectors.length > 0 && <StressTestPanel sectors={sectors} portfolio={portfolio} />}
 
           <Section title="Portfolio Summary" color="#F87171">
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(155px,1fr))", gap: 12 }}>
-              {[
-                { icon:<Activity size={14}/>,      label:"Total Loans",       value:String(totalLoans||"--"),         sub:"active accounts",       accent:"#60A5FA" },
-                { icon:<DollarSign size={14}/>,    label:"Outstanding (FCFA)", value:totalOut.toFixed(0)+"M",          sub:"total exposure",         accent:"#818CF8" },
-                { icon:<AlertTriangle size={14}/>, label:"NPL Ratio",         value:nplRatio+"%",                     sub:"non-performing loans",  accent:"#F87171" },
-                { icon:<Shield size={14}/>,        label:"ECL Provision",     value:totalEcl.toFixed(1)+"M",          sub:"expected credit loss",  accent:"#F59E0B" },
-                { icon:<TrendingDown size={14}/>,  label:"Avg PD Score",      value:avgPd+"%",                        sub:"probability of default",accent:"#FB923C" },
-                { icon:<AlertTriangle size={14}/>, label:"EWS Alerts",        value:String(ews.length||0),            sub:"high / critical flags", accent:"#F87171" },
-              ].map(k => (
-                <div key={k.label} style={{ background:"rgba(15,26,40,0.85)", border:"1px solid "+k.accent+"28", borderRadius:14, padding:"16px 18px", position:"relative", overflow:"hidden" }}>
-                  <div style={{ position:"absolute", top:-30, right:-30, width:80, height:80, borderRadius:"50%", background:k.accent, opacity:0.07, filter:"blur(20px)" }} />
-                  <div style={{ display:"flex", justifyContent:"space-between", marginBottom:10 }}>
-                    <span style={{ fontSize:10, color:"#94A3B8", fontWeight:600, letterSpacing:"0.06em", textTransform:"uppercase" }}>{k.label}</span>
-                    <span style={{ color:k.accent, opacity:0.8 }}>{k.icon}</span>
-                  </div>
-                  <div style={{ fontSize:26, fontWeight:700, color:"#F1F5F9", letterSpacing:"-0.02em", marginBottom:4 }}>{k.value}</div>
-                  <div style={{ fontSize:11, color:"#64748B" }}>{k.sub}</div>
-                </div>
-              ))}
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fit,minmax(175px,1fr))", gap:12 }}>
+              <KPICard icon={<Activity size={14}/>}      label="Total Loans"        value={totalLoans}           suffix=""   decimals={0} sub="active accounts"       accent="#60A5FA" trend="neutral" />
+              <KPICard icon={<DollarSign size={14}/>}    label="Outstanding (FCFA)" value={totalOut}             suffix="M"  decimals={0} sub="total exposure"         accent="#818CF8" trend="neutral" />
+              <KPICard icon={<AlertTriangle size={14}/>} label="NPL Ratio"          value={parseFloat(nplRatio)} suffix="%"  decimals={1} sub="non-performing loans"   accent="#F87171" trend="down" trendVal="above threshold" alert={parseFloat(nplRatio) > 5} />
+              <KPICard icon={<Shield size={14}/>}        label="ECL Provision"      value={totalEcl}             suffix="M"  decimals={1} sub="expected credit loss"   accent="#F59E0B" trend="neutral" />
+              <KPICard icon={<TrendingDown size={14}/>}  label="Avg PD Score"       value={parseFloat(avgPd)}    suffix="%"  decimals={1} sub="probability of default" accent="#FB923C" trend="down" />
+              <KPICard icon={<AlertTriangle size={14}/>} label="EWS Alerts"         value={ews.length}           suffix=""   decimals={0} sub="high / critical flags"  accent="#F87171" trend="down" trendVal="action needed" alert={ews.length > 3} />
             </div>
           </Section>
 
