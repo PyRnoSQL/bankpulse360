@@ -11,7 +11,7 @@ const PAGE_META: Record<string, { title: string; subtitle: string }> = {
   '/credit':    { title: 'Credit Risk & NPL',          subtitle: 'AI scoring · IFRS 9 · Portfolio · EWS'          },
   '/fraud':     { title: 'Fraud & AML',                subtitle: 'Detection · Typology · SAR workflow · Sanctions' },
   '/branches':  { title: 'Branch Operations',          subtitle: 'Lean Six Sigma · Process mining · SPC · DMAIC'  },
-  '/loans':     { title: 'Loan Origination',            subtitle: 'Multi-step underwriting · Risk engine · AI scoring'  },
+  '/loans':     { title: 'Loan Origination Form',        subtitle: 'Credit Risk & NPL · Underwriting · AI risk scoring · CreditRisk_NPL sheet'  },
   '/insurance': { title: 'Insurance Management',        subtitle: 'Life · Health · Property · Claims intelligence'     },
   '/reporting': { title: 'Institutional Reporting',     subtitle: 'COBAC · BEAC · IFRS 9 · Executive war room'         },
 }
@@ -20,6 +20,7 @@ const NAV = [
   { to: '/dashboard', label: '📊', full: 'Overview'      },
   { to: '/customers', label: '👥', full: 'Customer 360°' },
   { to: '/credit',    label: '📈', full: 'Credit & NPL'  },
+    { to: '/loans',     label: '📝', full: '↳ Loan Form'    },
   { to: '/fraud',     label: '🛡', full: 'Fraud & AML'   },
   { to: '/branches',  label: '🏦', full: 'Branch Ops'    },
     { to: '/loans',     label: '📝', full: 'Loan Form'      },
