@@ -38,6 +38,11 @@ const dist = path.join(__dirname, '..', 'dist')
 app.use(express.static(dist))
 app.get('*', (_req, res) => res.sendFile(path.join(dist, 'index.html')))
 
+
+const DIST = path.join(__dirname, '..', 'dist')
+app.use(express.static(DIST))
+app.get('*', (_req, res) => { res.sendFile(path.join(DIST, 'index.html')) })
+
 app.listen(PORT, () => {
   console.log('BankPulse360 running on port ' + PORT)
 })
