@@ -11,6 +11,9 @@ const PAGE_META: Record<string, { title: string; subtitle: string }> = {
   '/credit':    { title: 'Credit Risk & NPL',          subtitle: 'AI scoring · IFRS 9 · Portfolio · EWS'          },
   '/fraud':     { title: 'Fraud & AML',                subtitle: 'Detection · Typology · SAR workflow · Sanctions' },
   '/branches':  { title: 'Branch Operations',          subtitle: 'Lean Six Sigma · Process mining · SPC · DMAIC'  },
+  '/loans':     { title: 'Loan Origination',            subtitle: 'Multi-step underwriting · Risk engine · AI scoring'  },
+  '/insurance': { title: 'Insurance Management',        subtitle: 'Life · Health · Property · Claims intelligence'     },
+  '/reporting': { title: 'Institutional Reporting',     subtitle: 'COBAC · BEAC · IFRS 9 · Executive war room'         },
 }
 
 const NAV = [
@@ -19,6 +22,9 @@ const NAV = [
   { to: '/credit',    label: '📈', full: 'Credit & NPL'  },
   { to: '/fraud',     label: '🛡', full: 'Fraud & AML'   },
   { to: '/branches',  label: '🏦', full: 'Branch Ops'    },
+    { to: '/loans',     label: '📝', full: 'Loan Form'      },
+    { to: '/insurance', label: '🛡', full: 'Insurance'      },
+    { to: '/reporting', label: '📋', full: 'Reports'        },
 ]
 
 /* ── Date string (static per second) ────────────────────── */
