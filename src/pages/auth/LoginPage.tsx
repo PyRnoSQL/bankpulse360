@@ -93,7 +93,7 @@ export default function LoginPage() {
     finally { setLoading(false) }
   }
 
-  const inp = {width:'100%',padding:'13px 14px 13px 38px',fontSize:14,borderRadius:10,border:'1px solid rgba(255,255,255,0.1)',background:'rgba(255,255,255,0.05)',color:'#fff',outline:'none',fontFamily:'inherit',transition:'border-color 0.2s',boxSizing:'border-box'}
+  const inp = {width:'100%',padding:'13px 14px 13px 38px',fontSize:14,borderRadius:10,border:'1px solid rgba(255,255,255,0.1)',background:'rgba(255,255,255,0.05)',color:'#fff',outline:'none',fontFamily:'inherit',transition:'border-color 0.2s',boxSizing:'border-box' as const}
 
   return (
     <>

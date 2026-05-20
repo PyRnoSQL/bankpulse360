@@ -48,7 +48,7 @@ function StressTestPanel({ sectors, portfolio }: { sectors: any[]; portfolio: an
   const nplMultiplier       = 1 + shock * 0.045
   const liquidityPressure   = shock * 2.8
   const capitalAdequacy     = Math.max(8, 14.5 - shock * 0.42)
-  const branchRisk          = Math.min(20, ooc => ooc + Math.floor(shock * 0.25))
+  const branchRisk          = Math.min(20, Math.floor(shock * 0.25))
 
   const simNpl      = Math.min((baseNpl * nplMultiplier / totalLoans * 100), 60).toFixed(1)
   const simEcl      = (baseEcl * (1 + shock * 0.07)).toFixed(1)

@@ -77,7 +77,7 @@ export default function AICopilot() {
     setMsgs(next)
     setLoading(true)
     try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY || ''
+      const apiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY || ''
       const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=' + apiKey
       const history = next.slice(1, -1).map(m => ({
         role: m.role === 'assistant' ? 'model' : 'user',

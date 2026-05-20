@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import { Outlet, NavLink, useNavigate, useLocation } from 'react-router-dom'
 import { logout, getUser } from '@/lib/auth'
 import AICopilot from '@/components/ui/AICopilot'
-import AICopilot from '@/components/ui/AICopilot'
 
 
 const PAGE_META: Record<string, { title: string; subtitle: string }> = {
@@ -16,7 +15,6 @@ const PAGE_META: Record<string, { title: string; subtitle: string }> = {
   '/reporting': { title: 'Institutional Reporting',     subtitle: 'COBAC · BEAC · IFRS 9 · Executive war room'         },
 }
 
-const NAV = [
 const NAV = [
   { to: '/dashboard', label: '📊', full: 'Overview'       },
   { to: '/customers', label: '👥', full: 'Customer 360°'  },
@@ -143,15 +141,45 @@ export default function AppShell() {
         <nav style={{ flex: 1, padding: collapsed ? '12px 8px' : '12px 10px', transition: TRANSITION }}>
           {NAV.map((item: any) => {
             const hasChildren = item.children && item.children.length > 0
-            const isCredit    = item.to === '/credit'
+            const isExpanded  = hasChildren && creditOpen
+            const isModuleActive = item.children
+              ? item.children.some((c: any) => location.pathname === c.to) || location.pathname === item.to
+              : location.pathname === item.to
 
+            if (!hasChildren) {
+              return (
+                <NavLink
+                  key={item.to}
+                  to={item.to}
+                  title={item.full}
+                  style={({ isActive }) => ({
+                    display: 'flex', alignItems: 'center',
+                    gap: collapsed ? 0 : 10,
+                    justifyContent: collapsed ? 'center' : 'flex-start',
+                    padding: collapsed ? '10px 0' : '9px 12px',
+                    borderRadius: 9,
+                    textDecoration: 'none',
+                    fontSize: collapsed ? 18 : 13,
+                    fontWeight: isActive ? 600 : 400,
+                    color: isActive ? '#34D399' : '#64748B',
+                    background: isActive ? 'rgba(29,158,117,0.1)' : 'transparent',
+                    transition: 'all 0.15s',
+                    marginBottom: 2,
+                  })}>
+                  <span>{item.label}</span>
+                  {!collapsed && <span style={{ fontSize: 13 }}>{item.full}</span>}
+                </NavLink>
+              )
+            }
+
+            /* ── Module with sub-items (Credit & NPL) ── */
             return (
-              <div key={item.to}>
-                <div style={{ display:'flex', alignItems:'center' }}>
+              <div key={item.to} style={{ marginBottom: 2 }}>
+                {/* Parent button — toggles submenu, also navigates */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                   <NavLink
                     to={item.to}
                     title={item.full}
-                    onClick={() => { if (hasChildren) setCreditOpen(o => !o) }}
                     style={({ isActive }) => ({
                       flex: 1,
                       display: 'flex', alignItems: 'center',
@@ -161,20 +189,26 @@ export default function AppShell() {
                       borderRadius: 9,
                       textDecoration: 'none',
                       fontSize: collapsed ? 18 : 13,
-                      fontWeight: isActive ? 600 : 400,
-                      color: isActive ? '#34D399' : '#64748B',
-                      background: isActive ? 'rgba(29,158,117,0.1)' : 'transparent',
+                      fontWeight: isModuleActive ? 600 : 400,
+                      color: isModuleActive ? '#34D399' : '#64748B',
+                      background: isModuleActive ? 'rgba(29,158,117,0.1)' : 'transparent',
                       transition: 'all 0.15s',
                     })}>
                     <span>{item.label}</span>
                     {!collapsed && <span style={{ fontSize: 13 }}>{item.full}</span>}
-                    {!collapsed && hasChildren && (
-                      <span style={{ marginLeft:'auto', fontSize:10, color:'#475569', transition:'transform 0.2s', transform: creditOpen?'rotate(90deg)':'rotate(0deg)' }}>›</span>
-                    )}
                   </NavLink>
+                  {!collapsed && (
+                    <button
+                      onClick={() => setCreditOpen(o => !o)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px 8px', color: '#475569', fontSize: 13, lineHeight: 1, display: 'flex', alignItems: 'center' }}>
+                      {isExpanded ? '▾' : '›'}
+                    </button>
+                  )}
                 </div>
-                {hasChildren && !collapsed && creditOpen && (
-                  <div style={{ marginLeft:16, borderLeft:'1px solid rgba(29,158,117,0.2)', paddingLeft:8, marginBottom:2 }}>
+
+                {/* Sub-items */}
+                {!collapsed && isExpanded && (
+                  <div style={{ marginLeft: 16, marginTop: 2, marginBottom: 4, paddingLeft: 10, borderLeft: '1px solid rgba(29,158,117,0.2)' }}>
                     {item.children.map((child: any) => (
                       <NavLink
                         key={child.to}
@@ -190,8 +224,9 @@ export default function AppShell() {
                           color: isActive ? '#34D399' : '#475569',
                           background: isActive ? 'rgba(29,158,117,0.08)' : 'transparent',
                           transition: 'all 0.15s',
+                          marginBottom: 1,
                         })}>
-                        <span style={{ fontSize:14 }}>{child.label}</span>
+                        <span style={{ fontSize: 13 }}>{child.label}</span>
                         <span>{child.full}</span>
                       </NavLink>
                     ))}
