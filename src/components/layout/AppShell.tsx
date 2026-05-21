@@ -140,18 +140,13 @@ export default function AppShell() {
         {/* Nav links */}
         <nav style={{ flex: 1, padding: collapsed ? '12px 8px' : '12px 10px', transition: TRANSITION }}>
           {NAV.map((item: any) => {
-            const hasChildren = item.children && item.children.length > 0
-            const isExpanded  = hasChildren && creditOpen
-            const isModuleActive = item.children
-              ? item.children.some((c: any) => location.pathname === c.to) || location.pathname === item.to
-              : location.pathname === item.to
+            const hasChildren = !!(item.children && item.children.length)
 
             if (!hasChildren) {
               return (
                 <NavLink
                   key={item.to}
                   to={item.to}
-                  title={item.full}
                   style={({ isActive }) => ({
                     display: 'flex', alignItems: 'center',
                     gap: collapsed ? 0 : 10,
@@ -172,14 +167,11 @@ export default function AppShell() {
               )
             }
 
-            /* ── Module with sub-items (Credit & NPL) ── */
             return (
               <div key={item.to} style={{ marginBottom: 2 }}>
-                {/* Parent button — toggles submenu, also navigates */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
                   <NavLink
                     to={item.to}
-                    title={item.full}
                     style={({ isActive }) => ({
                       flex: 1,
                       display: 'flex', alignItems: 'center',
@@ -189,9 +181,9 @@ export default function AppShell() {
                       borderRadius: 9,
                       textDecoration: 'none',
                       fontSize: collapsed ? 18 : 13,
-                      fontWeight: isModuleActive ? 600 : 400,
-                      color: isModuleActive ? '#34D399' : '#64748B',
-                      background: isModuleActive ? 'rgba(29,158,117,0.1)' : 'transparent',
+                      fontWeight: isActive ? 600 : 400,
+                      color: isActive ? '#34D399' : '#64748B',
+                      background: isActive ? 'rgba(29,158,117,0.1)' : 'transparent',
                       transition: 'all 0.15s',
                     })}>
                     <span>{item.label}</span>
@@ -200,30 +192,24 @@ export default function AppShell() {
                   {!collapsed && (
                     <button
                       onClick={() => setCreditOpen(o => !o)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px 8px', color: '#475569', fontSize: 13, lineHeight: 1, display: 'flex', alignItems: 'center' }}>
-                      {isExpanded ? '▾' : '›'}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px 8px', color: '#475569', fontSize: 13 }}>
+                      {creditOpen ? '▾' : '›'}
                     </button>
                   )}
                 </div>
-
-                {/* Sub-items */}
-                {!collapsed && isExpanded && (
-                  <div style={{ marginLeft: 16, marginTop: 2, marginBottom: 4, paddingLeft: 10, borderLeft: '1px solid rgba(29,158,117,0.2)' }}>
+                {!collapsed && creditOpen && (
+                  <div style={{ marginLeft: 14, paddingLeft: 10, borderLeft: '1px solid rgba(29,158,117,0.2)' }}>
                     {item.children.map((child: any) => (
                       <NavLink
                         key={child.to}
                         to={child.to}
-                        title={child.full}
                         style={({ isActive }) => ({
                           display: 'flex', alignItems: 'center', gap: 8,
-                          padding: '7px 10px',
-                          borderRadius: 8,
-                          textDecoration: 'none',
-                          fontSize: 12,
+                          padding: '7px 10px', borderRadius: 8,
+                          textDecoration: 'none', fontSize: 12,
                           fontWeight: isActive ? 600 : 400,
                           color: isActive ? '#34D399' : '#475569',
                           background: isActive ? 'rgba(29,158,117,0.08)' : 'transparent',
-                          transition: 'all 0.15s',
                           marginBottom: 1,
                         })}>
                         <span style={{ fontSize: 13 }}>{child.label}</span>
@@ -384,7 +370,6 @@ export default function AppShell() {
         </div>
       </main>
 
-      <AICopilot />
       <AICopilot />
       <style>{`
         @keyframes livepulse {
