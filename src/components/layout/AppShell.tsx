@@ -15,17 +15,16 @@ const PAGE_META: Record<string, { title: string; subtitle: string }> = {
   '/reporting': { title: 'Institutional Reporting',     subtitle: 'COBAC · BEAC · IFRS 9 · Executive war room'         },
 }
 
-const NAV = [
-  { to: '/dashboard', label: '📊', full: 'Overview'       },
-  { to: '/customers', label: '👥', full: 'Customer 360°'  },
-  { to: '/credit',    label: '📈', full: 'Credit & NPL',  children: [
-    { to: '/loans',   label: '📝', full: 'Loan Origination' },
-  ]},
-  { to: '/fraud',     label: '🛡', full: 'Fraud & AML'    },
-  { to: '/branches',  label: '🏦', full: 'Branch Ops'     },
-  { to: '/insurance', label: '🛡', full: 'Insurance'       },
-  { to: '/reporting', label: '📋', full: 'Reports'         },
+const NAV_TOP = [
+  { to: '/dashboard', label: '📊', full: 'Overview'      },
+  { to: '/customers', label: '👥', full: 'Customer 360°' },
+  { to: '/credit',    label: '📈', full: 'Credit & NPL'  },
+  { to: '/fraud',     label: '🛡',  full: 'Fraud & AML'  },
+  { to: '/branches',  label: '🏦', full: 'Branch Ops'    },
+  { to: '/insurance', label: '🛡',  full: 'Insurance'    },
+  { to: '/reporting', label: '📋', full: 'Reports'       },
 ]
+const NAV_CREDIT_CHILD = { to: '/loans', label: '📝', full: 'Loan Origination' }
 
 /* ── Date string (static per second) ────────────────────── */
 function useNow() {
@@ -139,83 +138,50 @@ export default function AppShell() {
 
         {/* Nav links */}
         <nav style={{ flex: 1, padding: collapsed ? '12px 8px' : '12px 10px', transition: TRANSITION }}>
-          {NAV.map((item: any) => {
-            const hasChildren = !!(item.children && item.children.length)
-
-            if (!hasChildren) {
-              return (
-                <NavLink
-                  key={item.to}
-                  to={item.to}
-                  style={({ isActive }) => ({
-                    display: 'flex', alignItems: 'center',
-                    gap: collapsed ? 0 : 10,
-                    justifyContent: collapsed ? 'center' : 'flex-start',
-                    padding: collapsed ? '10px 0' : '9px 12px',
-                    borderRadius: 9,
-                    textDecoration: 'none',
-                    fontSize: collapsed ? 18 : 13,
-                    fontWeight: isActive ? 600 : 400,
-                    color: isActive ? '#34D399' : '#64748B',
-                    background: isActive ? 'rgba(29,158,117,0.1)' : 'transparent',
-                    transition: 'all 0.15s',
-                    marginBottom: 2,
-                  })}>
-                  <span>{item.label}</span>
-                  {!collapsed && <span style={{ fontSize: 13 }}>{item.full}</span>}
-                </NavLink>
-              )
-            }
-
+          {NAV_TOP.map(item => {
+            const isCredit = item.to === '/credit'
+            const linkStyle = ({ isActive }: { isActive: boolean }) => ({
+              display:        'flex' as const,
+              alignItems:     'center' as const,
+              gap:            collapsed ? 0 : 10,
+              justifyContent: collapsed ? 'center' as const : 'flex-start' as const,
+              padding:        collapsed ? '10px 0' : '9px 12px',
+              borderRadius:   9,
+              textDecoration: 'none' as const,
+              fontSize:       collapsed ? 18 : 13,
+              fontWeight:     isActive ? 600 : 400,
+              color:          isActive ? '#34D399' : '#64748B',
+              background:     isActive ? 'rgba(29,158,117,0.1)' : 'transparent',
+              transition:     'all 0.15s',
+              marginBottom:   2,
+            })
             return (
-              <div key={item.to} style={{ marginBottom: 2 }}>
+              <div key={item.to}>
                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                  <NavLink
-                    to={item.to}
-                    style={({ isActive }) => ({
-                      flex: 1,
-                      display: 'flex', alignItems: 'center',
-                      gap: collapsed ? 0 : 10,
-                      justifyContent: collapsed ? 'center' : 'flex-start',
-                      padding: collapsed ? '10px 0' : '9px 12px',
-                      borderRadius: 9,
-                      textDecoration: 'none',
-                      fontSize: collapsed ? 18 : 13,
-                      fontWeight: isActive ? 600 : 400,
-                      color: isActive ? '#34D399' : '#64748B',
-                      background: isActive ? 'rgba(29,158,117,0.1)' : 'transparent',
-                      transition: 'all 0.15s',
-                    })}>
+                  <NavLink to={item.to} style={linkStyle}>
                     <span>{item.label}</span>
                     {!collapsed && <span style={{ fontSize: 13 }}>{item.full}</span>}
                   </NavLink>
-                  {!collapsed && (
-                    <button
-                      onClick={() => setCreditOpen(o => !o)}
-                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '6px 8px', color: '#475569', fontSize: 13 }}>
+                  {isCredit && !collapsed && (
+                    <button onClick={() => setCreditOpen(o => !o)}
+                      style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '4px 6px', color: '#475569', fontSize: 12 }}>
                       {creditOpen ? '▾' : '›'}
                     </button>
                   )}
                 </div>
-                {!collapsed && creditOpen && (
-                  <div style={{ marginLeft: 14, paddingLeft: 10, borderLeft: '1px solid rgba(29,158,117,0.2)' }}>
-                    {item.children.map((child: any) => (
-                      <NavLink
-                        key={child.to}
-                        to={child.to}
-                        style={({ isActive }) => ({
-                          display: 'flex', alignItems: 'center', gap: 8,
-                          padding: '7px 10px', borderRadius: 8,
-                          textDecoration: 'none', fontSize: 12,
-                          fontWeight: isActive ? 600 : 400,
-                          color: isActive ? '#34D399' : '#475569',
-                          background: isActive ? 'rgba(29,158,117,0.08)' : 'transparent',
-                          marginBottom: 1,
-                        })}>
-                        <span style={{ fontSize: 13 }}>{child.label}</span>
-                        <span>{child.full}</span>
-                      </NavLink>
-                    ))}
+                {isCredit && !collapsed && creditOpen && (
+                  <div style={{ marginLeft: 14, paddingLeft: 10, borderLeft: '1px solid rgba(29,158,117,0.25)', marginBottom: 4 }}>
+                    <NavLink to={NAV_CREDIT_CHILD.to}
+                      style={({ isActive }) => ({
+                        display: 'flex', alignItems: 'center', gap: 8,
+                        padding: '7px 10px', borderRadius: 8, textDecoration: 'none',
+                        fontSize: 12, color: isActive ? '#34D399' : '#475569',
+                        fontWeight: isActive ? 600 : 400,
+                        background: isActive ? 'rgba(29,158,117,0.08)' : 'transparent',
+                      })}>
+                      <span>{NAV_CREDIT_CHILD.label}</span>
+                      <span>{NAV_CREDIT_CHILD.full}</span>
+                    </NavLink>
                   </div>
                 )}
               </div>
